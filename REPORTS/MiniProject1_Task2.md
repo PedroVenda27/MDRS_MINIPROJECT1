@@ -16,7 +16,7 @@ Os dados dos fluxos e dos casos são os mesmos da Task 1:
 
 Em todas as simulações: 50 corridas, P = 100 000 e intervalos de confiança a 90% (média ± 1,6449·√(S²/N)).
 
-Ficheiros:
+Ficheiros (pasta `WORK/`):
 
 | Ficheiro | Alínea | O que faz |
 |---|---|---|
@@ -83,14 +83,16 @@ O algoritmo continua a ser *work conserving* (Módulo 4, slide 4): a ligação s
 
 ## 2.b — Simulação do caso C (f₁ = f₂ = 1 000 000 Bytes)
 
+![Task 2.b](../WORK/Task2b.png)
+
 **Resultados (média ± IC 90%):**
 
 | Parâmetro | Fluxo 1 | Fluxo 2 | Fluxo 3 |
 |---|---|---|---|
 | Perda de pacotes PL (%) | 0 | 0 | 0 |
-| Atraso médio APD (ms) | 11,10 ± 0,23 | 10,55 ± 0,22 | 1,104 ± 0,001 |
-| Atraso máximo MPD (ms) | 69,5 ± 2,9 | 69,4 ± 2,9 | 4,47 ± 0,09 |
-| Throughput TT (Mbps) | 5,118 ± 0,007 | 0,800 ± 0,001 | 3,602 ± 0,005 |
+| Atraso médio APD (ms) | 10,74 ± 0,25 | 10,20 ± 0,25 | 1,101 ± 0,002 |
+| Atraso máximo MPD (ms) | 67,0 ± 3,1 | 66,9 ± 3,1 | 4,48 ± 0,09 |
+| Throughput TT (Mbps) | 5,114 ± 0,007 | 0,800 ± 0,001 | 3,596 ± 0,005 |
 
 **Justificação dos resultados entre fluxos:**
 - **O Fluxo 3 tem atrasos muito mais baixos** (1,1 ms em média e 4,5 ms no máximo). Os seus pacotes passam à frente de todos os pacotes dos Fluxos 1 e 2. Só esperam por:
@@ -98,25 +100,27 @@ O algoritmo continua a ser *work conserving* (Módulo 4, slide 4): a ligação s
   - outros pacotes do próprio Fluxo 3.
 
   O Fluxo 3 sozinho ocupa só ρ₃ = 0,36 da ligação, por isso a sua fila é quase sempre curta.
-- **Os Fluxos 1 e 2 têm atrasos semelhantes entre si** (cerca de 11 ms e cerca de 10,6 ms). Partilham a mesma fila FIFO de prioridade baixa e por isso esperam o mesmo. A diferença é o tempo de transmissão de cada pacote (0,64 ms contra 0,10 ms).
+- **Os Fluxos 1 e 2 têm atrasos semelhantes entre si** (10,7 ms e 10,2 ms). Partilham a mesma fila FIFO de prioridade baixa e por isso esperam o mesmo. A diferença (0,54 ms) é exatamente a diferença entre os tempos de transmissão de cada pacote (0,64 − 0,10 ms).
 - **Não há perdas**, porque as filas de 1 000 000 Bytes nunca enchem.
 - **O throughput de cada fluxo é igual ao débito que chega** (5,12 / 0,80 / 3,60 Mbps). A carga total é ρ = 0,952 < 1, por isso tudo o que chega acaba por ser transmitido. As prioridades mudam *quando* cada pacote é transmitido, não *quanto* é transmitido.
-- **Intervalos de confiança:** o do Fluxo 3 é muito estreito (±0,001 ms), porque o seu atraso é estável. Os dos Fluxos 1 e 2 são largos, porque estes fluxos absorvem toda a variabilidade do sistema.
+- **Intervalos de confiança:** o do Fluxo 3 é muito estreito (±0,002 ms), porque o seu atraso é estável. Os dos Fluxos 1 e 2 são largos, porque estes fluxos absorvem toda a variabilidade do sistema.
 
 **Comparação com a Task 1.b (FIFO):**
 
 | APD (ms) | Fluxo 1 | Fluxo 2 | Fluxo 3 |
 |---|---|---|---|
-| FIFO (1.b) | 7,31 | 6,77 | 7,28 |
-| Prioridades (2.b) | 11,10 | 10,55 | 1,10 |
+| FIFO (1.b) | 7,10 | 6,56 | 7,05 |
+| Prioridades (2.b) | 10,74 | 10,20 | 1,10 |
 
 | MPD (ms) | Fluxo 1 | Fluxo 2 | Fluxo 3 |
 |---|---|---|---|
-| FIFO (1.b) | 42,5 | 42,3 | 42,4 |
-| Prioridades (2.b) | 69,5 | 69,4 | 4,47 |
+| FIFO (1.b) | 42,2 | 41,8 | 42,1 |
+| Prioridades (2.b) | 67,0 | 66,9 | 4,48 |
 
-- Com FIFO, os três fluxos têm praticamente o mesmo atraso, porque esperam todos na mesma fila. Com PQ há **diferenciação de atraso**: o Fluxo 3 ganha cerca de 6 ms no atraso médio e cerca de 38 ms no atraso máximo. Os Fluxos 1 e 2 perdem cerca de 3,8 ms no médio e cerca de 27 ms no máximo.
-- **Ninguém ganha "de graça".** O PQ redistribui o atraso entre fluxos, mas não o reduz no total. A média dos atrasos na fila, pesada pela carga ρᵢ de cada fluxo, é a mesma com FIFO e com PQ (lei de conservação de Kleinrock, válida para algoritmos *work conserving* com tamanhos de pacote que não dependem da prioridade).
+- Com FIFO, os três fluxos têm praticamente o mesmo atraso, porque esperam todos na mesma fila. Com PQ há **diferenciação de atraso**: o Fluxo 3 ganha cerca de 6 ms no atraso médio e cerca de 38 ms no atraso máximo. Os Fluxos 1 e 2 perdem cerca de 3,6 ms no médio e cerca de 25 ms no máximo.
+- **Ninguém ganha "de graça".** O PQ redistribui o atraso entre fluxos, mas não o reduz no total. A média dos atrasos na fila, pesada pela carga ρᵢ de cada fluxo, é a mesma com FIFO e com PQ (lei de conservação de Kleinrock, válida para algoritmos *work conserving* com tamanhos de pacote que não dependem da prioridade). Com os valores simulados:
+  - **PQ:** (0,36 × 0,50 + 0,592 × 10,10) / 0,952 ≈ **6,47 ms**;
+  - **FIFO:** ≈ **6,46 ms** (atraso na fila da 1.b).
 - O **throughput e as perdas não mudam**, porque com ρ < 1 e filas grandes a ligação transmite tudo nos dois casos.
 - Os Fluxos 1 e 2 ainda não sofrem *starvation* (Módulo 4, slide 6), porque o Fluxo 3 sozinho só ocupa 36% da ligação. Se ρ₃ se aproximasse de 1, os Fluxos 1 e 2 quase nunca seriam transmitidos.
 
@@ -158,15 +162,23 @@ Valores intermédios:
 - W_Q (prioridade alta) = 0,503 ms;
 - W_Q (prioridade baixa) = 10,475 ms.
 
+![Task 2.c](../WORK/Task2c.png)
+
 **Comparação com a simulação:**
 
 | APD (ms) | Fluxo 1 | Fluxo 2 | Fluxo 3 |
 |---|---|---|---|
 | M/G/1 com prioridades | 11,115 | 10,575 | 1,103 |
-| Simulação (2.b) | 11,100 ± 0,227 | 10,554 ± 0,224 | 1,104 ± 0,001 |
+| Simulação (2.b) | 10,745 ± 0,252 | 10,205 ± 0,247 | 1,101 ± 0,002 |
+| Diferença relativa | −3,3% | −3,5% | −0,2% |
 
 **Conclusões:**
-- **Todos os valores teóricos estão dentro dos intervalos de confiança a 90%.** O simulador implementa corretamente o PQ, e o modelo M/G/1 com prioridades descreve com exatidão este cenário (Poisson, serviço geral, filas muito grandes).
+- **Fluxo 3 (prioridade alta):** a teoria e a simulação coincidem (1,103 contra 1,101 ms, diferença de 0,2%). Este fluxo vê uma carga baixa (ρ₁ = 0,36), por isso o seu atraso é estável e fácil de estimar.
+- **Fluxos 1 e 2 (prioridade baixa):** a simulação fica cerca de 3,4% abaixo da teoria, ligeiramente fora do intervalo de confiança a 90%. É o mesmo efeito observado na 1.c. Estes fluxos absorvem toda a variabilidade de uma ligação com ρ = 0,952. Com só 50 corridas, o intervalo de confiança subestima a incerteza real, e o efeito de *warm-up* (cada corrida começa vazia) puxa a média para baixo (Módulo 3, slide 23).
+- Apesar dessa pequena diferença, o modelo descreve corretamente o comportamento:
+  - a diferença entre os Fluxos 1 e 2 é exatamente a prevista;
+  - a redução do atraso do Fluxo 3 em relação ao FIFO é a prevista;
+  - o aumento do atraso dos Fluxos 1 e 2 é o previsto.
 - O modelo explica porque é que o Fluxo 3 continua a ter algum atraso na fila (0,5 ms) apesar de ter a prioridade máxima. O PQ do enunciado é **não preemptivo**: um pacote do Fluxo 3 que chega a meio da transmissão de um pacote do Fluxo 1, que pode ter até 1500 B (1,2 ms), tem de esperar que essa transmissão termine. É isso que representa o termo Σλᵢ·E[Sᵢ²] no numerador.
 - O termo (1 − ρ₁)·(1 − ρ₁ − ρ₂) = 0,64 × 0,048 no denominador da prioridade baixa é o que faz o atraso dos Fluxos 1 e 2 disparar. Eles "veem" uma ligação com ρ total = 0,952 e, além disso, só têm a capacidade que o Fluxo 3 deixa livre.
 
@@ -176,28 +188,30 @@ Valores intermédios:
 
 O script `Task2d.m` corre 50 simulações por caso com `Sim2FlowsPrio_newversion` e guarda o APD e o MPD do Fluxo 3. O gráfico mostra lado a lado os resultados com FIFO (1.d) e com prioridades (2.d). A coluna "M/G/1 prio." usa as fórmulas da 2.c.
 
+![Task 2.d](../WORK/Task2d.png)
+
 | Caso | ρ total | APD Fluxo 3 — PQ (sim.) | APD Fluxo 3 — M/G/1 prio. | MPD Fluxo 3 — PQ (sim.) |
 |---|---|---|---|---|
-| A | 0,656 | 0,939 ± 0,001 ms | 0,939 ms | 4,58 ± 0,10 ms |
-| B | 0,804 | 1,022 ± 0,001 ms | 1,021 ms | 4,70 ± 0,11 ms |
-| C | 0,952 | 1,101 ± 0,002 ms | 1,103 ms | 4,60 ± 0,14 ms |
+| A | 0,656 | 0,938 ± 0,001 ms | 0,939 ms | 4,47 ± 0,11 ms |
+| B | 0,804 | 1,021 ± 0,001 ms | 1,021 ms | 4,46 ± 0,09 ms |
+| C | 0,952 | 1,102 ± 0,001 ms | 1,103 ms | 4,40 ± 0,09 ms |
 
 **Comparação com a Task 1.d (FIFO):**
 
 | Caso | APD Fluxo 3 — FIFO (1.d) | APD Fluxo 3 — PQ (2.d) | MPD Fluxo 3 — FIFO (1.d) | MPD Fluxo 3 — PQ (2.d) |
 |---|---|---|---|---|
-| A | 1,232 ms | 0,939 ms | 9,2 ms | 4,58 ms |
-| B | 1,975 ms | 1,022 ms | 15,3 ms | 4,70 ms |
-| C | 7,29 ms | 1,101 ms | 43,8 ms | 4,60 ms |
+| A | 1,231 ms | 0,938 ms | 9,07 ms | 4,47 ms |
+| B | 1,981 ms | 1,021 ms | 14,9 ms | 4,46 ms |
+| C | 7,38 ms | 1,102 ms | 43,7 ms | 4,40 ms |
 
 **Justificação e conclusões:**
-- **Com PQ, o desempenho do Fluxo 3 quase não depende do tráfego dos outros fluxos.** Entre os casos A e C, o atraso médio só sobe de 0,94 para 1,10 ms (+17%) e o atraso máximo fica praticamente constante (cerca de 4,6 ms). Com FIFO, o atraso médio sobe cerca de 6 vezes e o máximo cerca de 5 vezes.
+- **Com PQ, o desempenho do Fluxo 3 quase não depende do tráfego dos outros fluxos.** Entre os casos A e C, o atraso médio só sobe de 0,94 para 1,10 ms (+17%) e o atraso máximo fica constante (cerca de 4,4–4,5 ms). Com FIFO, o atraso médio sobe 6 vezes e o máximo quase 5 vezes.
 - **Porque é que o atraso médio ainda sobe um pouco:** com PQ, a fila do Fluxo 3 só "vê" o seu próprio tráfego, ρ₁ = 0,36, que é igual nos 3 casos. Mas o numerador Σλᵢ·E[Sᵢ²] cresce com o tráfego dos Fluxos 1 e 2. Com mais tráfego, é mais provável que um pacote do Fluxo 3 chegue a meio da transmissão de um pacote do Fluxo 1, e tenha de esperar que ela termine (PQ não preemptivo).
-- **O atraso máximo fica constante e baixo (cerca de 4,6 ms).** No pior caso, o pacote do Fluxo 3 espera:
+- **O atraso máximo fica constante e baixo.** No pior caso, o pacote do Fluxo 3 espera:
   - um pacote grande de prioridade baixa (até 1500 B = 1,2 ms);
   - os pacotes do próprio Fluxo 3 que já estão na fila.
 
   Nenhuma destas parcelas depende da carga dos Fluxos 1 e 2.
-- **A diferença entre FIFO e PQ aumenta com a carga.** No caso A a melhoria é de 24% no atraso médio; no caso C, o atraso médio é cerca de 6,6 vezes menor e o máximo cerca de 9,5 vezes menor. A prioridade é mais útil precisamente quando a ligação está mais congestionada.
-- **Os resultados coincidem com o M/G/1 com prioridades** nos 3 casos (valores dentro ou praticamente sobre os intervalos de confiança).
+- **A diferença entre FIFO e PQ aumenta com a carga.** No caso A a melhoria é de 24% no atraso médio; no caso C, o atraso médio é cerca de 6,7 vezes menor e o máximo cerca de 10 vezes menor. A prioridade é mais útil precisamente quando a ligação está mais congestionada.
+- **Os resultados coincidem com o M/G/1 com prioridades** nos 3 casos (diferenças ≤ 0,1%).
 - **Contrapartida:** isto só é possível à custa dos Fluxos 1 e 2 (ver 2.b). Se o Fluxo 3 tivesse muito mais tráfego, poderia levar à *starvation* dos fluxos de prioridade baixa. É esse o problema que o DRR (Task 3) resolve.

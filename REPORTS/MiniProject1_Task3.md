@@ -14,7 +14,7 @@
 
 Em todas as simulações: 50 corridas, P = 100 000 e intervalos de confiança a 90% (média ± 1,6449·√(S²/N)).
 
-Ficheiros:
+Ficheiros (pasta `WORK/`):
 
 | Ficheiro | Alínea | O que faz |
 |---|---|---|
@@ -90,40 +90,42 @@ O `while` exterior garante que se repetem rondas até haver pelo menos um pacote
 
 ## 3.b — Caso C com Q = 1500 / 1500 / 1500
 
+![Task 3.b](../WORK/Task3b.png)
+
 **Resultados (média ± IC 90%):**
 
 | Parâmetro | Fluxo 1 | Fluxo 2 | Fluxo 3 |
 |---|---|---|---|
 | PL (%) | 0 | 0 | 0 |
-| APD (ms) | 9,97 ± 0,34 | 2,02 ± 0,01 | 4,30 ± 0,04 |
-| MPD (ms) | 70,8 ± 3,3 | 5,25 ± 0,03 | 24,8 ± 0,8 |
-| TT (Mbps) | 5,118 ± 0,007 | 0,800 ± 0,001 | 3,599 ± 0,005 |
+| APD (ms) | 10,05 ± 0,33 | 2,02 ± 0,01 | 4,32 ± 0,04 |
+| MPD (ms) | 73,8 ± 3,4 | 5,26 ± 0,03 | 25,4 ± 0,9 |
+| TT (Mbps) | 5,115 ± 0,008 | 0,800 ± 0,001 | 3,602 ± 0,006 |
 
 **Justificação dos resultados entre fluxos:**
 - **Não há perdas e o throughput é igual ao débito pedido.** Com ρ = 0,952 < 1 e filas grandes, todo o tráfego acaba por ser transmitido. Os quanta só decidem *a ordem*.
 - **Os pesos são iguais (1500 B por ronda para cada fluxo).** Em congestionamento, cada fluxo ativo tem direito a 1/3 da ligação, cerca de 3,33 Mbps (Módulo 4, slide 17). O atraso de cada fluxo depende de quanto o seu débito está longe dessa parte:
-  - **Fluxo 2 (0,8 Mbps, muito abaixo de 3,33):** a sua fila esvazia em cada ronda. Um pacote só espera pela ronda em curso, por isso tem o atraso mais baixo (2,0 ms médio e 5,2 ms máximo).
+  - **Fluxo 2 (0,8 Mbps, muito abaixo de 3,33):** a sua fila esvazia em cada ronda. Um pacote só espera pela ronda em curso, por isso tem o atraso mais baixo (2,0 ms médio e 5,3 ms máximo).
   - **Fluxo 3 (3,6 Mbps, ligeiramente acima de 3,33):** nos picos de congestionamento acumula alguns pacotes. Atraso intermédio (4,3 ms).
-  - **Fluxo 1 (5,12 Mbps, bem acima de 3,33):** nos períodos de congestionamento fica limitado à sua parte e a sua fila cresce. Absorve a maior parte do atraso (10 ms médio e 71 ms máximo).
+  - **Fluxo 1 (5,12 Mbps, bem acima de 3,33):** nos períodos de congestionamento fica limitado à sua parte e a sua fila cresce. Absorve a maior parte do atraso (10 ms médio e 74 ms máximo).
 - **Diferença em relação ao FIFO:** o atraso de um fluxo passa a depender sobretudo do **seu próprio** tráfego e não do tráfego dos outros. Quem envia mais é quem espera mais.
 
 **Comparação com a 1.b (FIFO) e a 2.b (PQ):**
 
 | APD (ms) | Fluxo 1 | Fluxo 2 | Fluxo 3 |
 |---|---|---|---|
-| FIFO (1.b) | 7,31 | 6,77 | 7,28 |
-| PQ, Fluxo 3 prioritário (2.b) | 11,10 | 10,55 | 1,10 |
-| DRR, Q iguais (3.b) | 9,97 | 2,02 | 4,30 |
+| FIFO (1.b) | 7,10 | 6,56 | 7,05 |
+| PQ, Fluxo 3 prioritário (2.b) | 10,74 | 10,20 | 1,10 |
+| DRR, Q iguais (3.b) | 10,05 | 2,02 | 4,32 |
 
 | MPD (ms) | Fluxo 1 | Fluxo 2 | Fluxo 3 |
 |---|---|---|---|
-| FIFO (1.b) | 42,5 | 42,3 | 42,4 |
-| PQ (2.b) | 69,5 | 69,4 | 4,47 |
-| DRR (3.b) | 70,8 | 5,25 | 24,8 |
+| FIFO (1.b) | 42,2 | 41,8 | 42,1 |
+| PQ (2.b) | 67,0 | 66,9 | 4,48 |
+| DRR (3.b) | 73,8 | 5,26 | 25,4 |
 
 - **FIFO:** não diferencia os fluxos, todos esperam o mesmo (cerca de 7 ms).
-- **PQ:** diferencia por prioridade fixa. O Fluxo 3 é o melhor de todos (1,1 ms), mas os Fluxos 1 e 2 são castigados por igual. O Fluxo 2, com muito pouco tráfego, passa de 6,8 para 10,6 ms.
-- **DRR:** diferencia por **justiça** (*max-min fairness*). Protege os fluxos com pouco tráfego, como o Fluxo 2 (6,8 → 2,0 ms), e castiga o fluxo que usa mais do que a sua parte (Fluxo 1). O Fluxo 3 fica entre FIFO e PQ: 4,3 ms, contra 7,3 ms com FIFO e 1,1 ms com PQ.
+- **PQ:** diferencia por prioridade fixa. O Fluxo 3 é o melhor de todos (1,1 ms), mas os Fluxos 1 e 2 são castigados por igual. O Fluxo 2, com muito pouco tráfego, passa de 6,6 para 10,2 ms.
+- **DRR:** diferencia por **justiça** (*max-min fairness*). Protege os fluxos com pouco tráfego, como o Fluxo 2 (6,6 → 2,0 ms), e castiga o fluxo que usa mais do que a sua parte (Fluxo 1). O Fluxo 3 fica entre FIFO e PQ: 4,3 ms, contra 7,05 ms com FIFO e 1,1 ms com PQ.
 - **Throughput e perdas** são iguais nos três algoritmos, porque com ρ < 1 nenhum deles perde pacotes.
 - Em todos os algoritmos *work conserving*, a média dos atrasos na fila pesada pela carga de cada fluxo é a mesma. Mudar de algoritmo só muda **quem** espera.
 
@@ -131,14 +133,16 @@ O `while` exterior garante que se repetem rondas até haver pelo menos um pacote
 
 ## 3.c — Caso D (congestionado) com Q = 1500 / 1500 / 1500
 
+![Task 3.c](../WORK/Task3c.png)
+
 **Resultados (média ± IC 90%):**
 
 | Parâmetro | Fluxo 1 | Fluxo 2 | Fluxo 3 |
 |---|---|---|---|
-| PL (%) | 21,22 ± 0,09 | 0 | 20,89 ± 0,09 |
-| APD (ms) | 1650 ± 1,7 | 2,79 ± 0,001 | 1619 ± 1,8 |
-| MPD (ms) | 1791 ± 0,6 | 5,52 ± 0,04 | 1792 ± 0,6 |
-| TT (Mbps) | 4,500 ± 0,001 | 1,000 ± 0,001 | 4,500 ± 0,001 |
+| PL (%) | 21,21 ± 0,08 | 0 | 20,93 ± 0,07 |
+| APD (ms) | 1649 ± 1,4 | 2,79 ± 0,001 | 1621 ± 1,4 |
+| MPD (ms) | 1791 ± 0,7 | 5,50 ± 0,03 | 1792 ± 0,7 |
+| TT (Mbps) | 4,500 ± 0,001 | 0,999 ± 0,001 | 4,500 ± 0,001 |
 
 **Justificação dos resultados entre fluxos:**
 - **O débito pedido (13,4 Mbps) é maior do que a capacidade (10 Mbps).** A ligação está sempre ocupada e as filas dos fluxos que pedem mais do que a sua parte enchem.
@@ -166,23 +170,26 @@ O `while` exterior garante que se repetem rondas até haver pelo menos um pacote
 
 O quantum do Fluxo 3 passa a ser 3 vezes maior. Em cada ronda pode enviar até 4500 B, enquanto os Fluxos 1 e 2 enviam até 1500 B. Os pesos ficam 1 : 1 : 3.
 
+![Task 3.d](../WORK/Task3d.png)
+
 **Resultados (média ± IC 90%):**
 
 | Parâmetro | Fluxo 1 | Fluxo 2 | Fluxo 3 |
 |---|---|---|---|
-| PL (%) | 42,15 ± 0,13 | 0 | 0 |
-| APD (ms) | 2518 ± 6 | 3,72 ± 0,01 | 7,69 ± 0,06 |
-| MPD (ms) | 2916 ± 13 | 9,22 ± 0,12 | 34,7 ± 1,2 |
-| TT (Mbps) | 3,000 ± 0,008 | 1,000 ± 0,001 | 5,999 ± 0,007 |
+| PL (%) | 42,02 ± 0,12 | 0 | 0 |
+| APD (ms) | 2514 ± 6 | 3,72 ± 0,005 | 7,72 ± 0,06 |
+| MPD (ms) | 2928 ± 15 | 9,32 ± 0,17 | 34,1 ± 1,4 |
+| TT (Mbps) | 3,003 ± 0,006 | 1,000 ± 0,001 | 5,997 ± 0,006 |
 
 **Justificação dos resultados entre fluxos:**
 - **Fluxo 3:** com peso 3/5, tem direito a 6 Mbps quando os 3 fluxos estão ativos. Pede exatamente 6,0 Mbps, por isso **recebe tudo**:
   - 0% de perdas;
-  - atraso de apenas 7,7 ms (máximo 35 ms), porque a sua fila nunca acumula muito.
+  - atraso de apenas 7,7 ms (máximo 34 ms), porque a sua fila nunca acumula muito.
 - **Fluxo 2:** continua a receber tudo o que pede (1,0 Mbps), sem perdas e com atraso baixo (3,7 ms).
 - **Fluxo 1:** é o único fluxo que pede mais do que tem direito. Fica com o que sobra, 10 − 1 − 6 = **3 Mbps**:
   - perde 42% dos pacotes (em bytes seriam 1 − 3/6,4 ≈ 53%; a diferença explica-se como na 3.c);
   - tem a fila sempre cheia, por isso o atraso é de cerca de 2,5 s. Esvaziar 1 MB a 3 Mbps demora 1e6·8 / 3e6 ≈ 2,67 s.
+  - O atraso **máximo** (2,93 s) é um pouco maior do que estes 2,67 s. O Fluxo 3 está exatamente no limite da sua parte (6 Mbps), por isso nos períodos em que acumula pacotes usa mais do que 6 Mbps, e nesses períodos o Fluxo 1 recebe menos de 3 Mbps.
 
 **Comparação com a 3.c (quanta iguais):**
 
@@ -191,14 +198,14 @@ O quantum do Fluxo 3 passa a ser 3 vezes maior. Em cada ronda pode enviar até 4
 | TT 3.c (Mbps) | 4,50 | 1,00 | 4,50 |
 | TT 3.d (Mbps) | 3,00 | 1,00 | 6,00 |
 | PL 3.c (%) | 21,2 | 0 | 20,9 |
-| PL 3.d (%) | 42,1 | 0 | 0 |
-| APD 3.c (ms) | 1650 | 2,8 | 1619 |
-| APD 3.d (ms) | 2518 | 3,7 | 7,7 |
+| PL 3.d (%) | 42,0 | 0 | 0 |
+| APD 3.c (ms) | 1649 | 2,8 | 1621 |
+| APD 3.d (ms) | 2514 | 3,7 | 7,7 |
 
 - Triplicar o quantum do Fluxo 3 transfere **1,5 Mbps do Fluxo 1 para o Fluxo 3**. O Fluxo 3 deixa de perder pacotes e o seu atraso cai de 1,6 s para 7,7 ms. O Fluxo 1 duplica as perdas e passa a 2,5 s de atraso.
 - O Fluxo 2 quase não é afetado. Em ambos os casos pede menos do que a sua parte, por isso recebe tudo. O seu atraso sobe ligeiramente (2,8 → 3,7 ms) porque em cada ronda o Fluxo 3 transmite até 4500 B em vez de 1500 B, e a ronda fica mais longa.
 - Isto mostra que, no DRR, o **administrador da rede controla a repartição da capacidade** em congestionamento através dos quanta. Não precisa de conhecer o tamanho médio dos pacotes, porque os quanta são definidos em bytes (Módulo 4, slide 25).
-- **Contrapartida:** um quantum maior significa sequências mais longas de pacotes do mesmo fluxo em cada ronda, o que aumenta o *jitter* dos outros fluxos. É isso que se vê no MPD do Fluxo 2 (5,5 → 9,2 ms).
+- **Contrapartida:** um quantum maior significa sequências mais longas de pacotes do mesmo fluxo em cada ronda, o que aumenta o *jitter* dos outros fluxos. É isso que se vê no MPD do Fluxo 2 (5,5 → 9,3 ms).
 
 ---
 
@@ -260,12 +267,12 @@ end
 | Throughput (Mbps) | Fluxo 1 | Fluxo 2 | Fluxo 3 |
 |---|---|---|---|
 | 3.c — ideal (1:1:1) | 4,500 | 1,000 | 4,500 |
-| 3.c — simulação | 4,500 ± 0,001 | 1,000 ± 0,001 | 4,500 ± 0,001 |
+| 3.c — simulação | 4,500 ± 0,001 | 0,999 ± 0,001 | 4,500 ± 0,001 |
 | 3.d — ideal (1:1:3) | 3,000 | 1,000 | 6,000 |
-| 3.d — simulação | 3,000 ± 0,008 | 1,000 ± 0,001 | 5,999 ± 0,007 |
+| 3.d — simulação | 3,003 ± 0,006 | 1,000 ± 0,001 | 5,997 ± 0,006 |
 
 **Conclusões:**
-- **A simulação coincide com o throughput ideal em todos os fluxos, nos dois casos.** Os valores ideais estão dentro dos intervalos de confiança. O DRR implementa o max-min fairness ponderado, com pesos iguais aos quanta, nos períodos de congestionamento longos (Módulo 4, slides 23 e 26).
+- **A simulação coincide com o throughput ideal em todos os fluxos, nos dois casos.** Os valores ideais estão dentro dos intervalos de confiança, ou a menos de 0,1%. O DRR implementa o max-min fairness ponderado, com pesos iguais aos quanta, nos períodos de congestionamento longos (Módulo 4, slides 23 e 26).
 - Neste caso o congestionamento é permanente (ρ = 1,34): a ligação está sempre ocupada e todas as filas estão sempre ativas. É a situação em que o DRR se aproxima mais do comportamento ideal.
 - **O DRR consegue isto sem conhecer os tamanhos médios dos pacotes.** Os Fluxos 1 e 3 têm pacotes de tamanhos diferentes (800 B e 750 B em média) e mesmo assim recebem exatamente 4,5 Mbps cada na 3.c. Com o RR simples, a repartição seria proporcional ao tamanho médio dos pacotes; com o WRR, seria preciso conhecer esses tamanhos com antecedência (Módulo 4, slides 19–22).
 - **Os fluxos que pedem menos do que a sua parte nunca são penalizados.** É o caso do Fluxo 2 nos dois casos e do Fluxo 3 na 3.d: têm 0% de perdas e atrasos de poucos milissegundos.
