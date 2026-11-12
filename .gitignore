@@ -1,5 +1,6 @@
-# Material do professor (slides e enunciado) - nao publicar
+# Slides do professor - nao publicar (o enunciado e publicado)
 *.pdf
+!ENUNCIADO/*.pdf
 
 # Ficheiros temporarios do MATLAB
 *.asv
