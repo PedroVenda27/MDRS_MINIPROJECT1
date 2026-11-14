@@ -16,7 +16,7 @@ Os dados dos fluxos e dos casos são os mesmos da Task 1:
 
 Em todas as simulações: 50 corridas, P = 100 000 e intervalos de confiança a 90% (média ± 1,6449·√(S²/N)).
 
-Ficheiros (pasta `WORK/Alineas/`; o simulador original está em `WORK/`):
+Ficheiros (pasta `WORK/RESOLUÇÃO MODELO AI/`; o simulador original está em `WORK/`):
 
 | Ficheiro | Alínea | O que faz |
 |---|---|---|
@@ -83,7 +83,7 @@ O algoritmo continua a ser *work conserving* (Módulo 4, slide 4): a ligação s
 
 ## 2.b — Simulação do caso C (f₁ = f₂ = 1 000 000 Bytes)
 
-![Task 2.b](../WORK/Alineas/Task2b.png)
+![Task 2.b](<../WORK/RESOLUÇÃO MODELO AI/Task2b.png>)
 
 **Resultados (média ± IC 90%):**
 
@@ -162,7 +162,7 @@ Valores intermédios:
 - W_Q (prioridade alta) = 0,503 ms;
 - W_Q (prioridade baixa) = 10,475 ms.
 
-![Task 2.c](../WORK/Alineas/Task2c.png)
+![Task 2.c](<../WORK/RESOLUÇÃO MODELO AI/Task2c.png>)
 
 **Comparação com a simulação:**
 
@@ -188,7 +188,7 @@ Valores intermédios:
 
 O script `Task2d.m` corre 50 simulações por caso com `Sim2FlowsPrio_newversion` e guarda o APD e o MPD do Fluxo 3. O gráfico mostra lado a lado os resultados com FIFO (1.d) e com prioridades (2.d). A coluna "M/G/1 prio." usa as fórmulas da 2.c.
 
-![Task 2.d](../WORK/Alineas/Task2d.png)
+![Task 2.d](<../WORK/RESOLUÇÃO MODELO AI/Task2d.png>)
 
 | Caso | ρ total | APD Fluxo 3 — PQ (sim.) | APD Fluxo 3 — M/G/1 prio. | MPD Fluxo 3 — PQ (sim.) |
 |---|---|---|---|---|

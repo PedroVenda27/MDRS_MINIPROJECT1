@@ -48,17 +48,17 @@ Todas as simulações usam **50 corridas** de **P = 100 000 pacotes**, com **int
 └── WORK/                           Código MATLAB
     ├── Sim2Flows_original.m        Simulador fornecido (FIFO, 2 fluxos)
     │
-    ├── Ex1/                        Exercício 1 num só script
+    ├── EXERCICIO 1/                Exercício 1 num só script
     │   ├── MiniProject_Ex1_Jose_Fernandes_Pedro_Venda.m
     │   └── Sim2FlowsMP.m           1.a  FIFO com 3 fluxos
-    ├── Ex2/                        Exercício 2 num só script
+    ├── EXERCICIO 2/                Exercício 2 num só script
     │   ├── MiniProject_Ex2_Jose_Fernandes_Pedro_Venda.m
     │   └── Sim2FlowsPrioMP.m       2.a  Priority Queuing com 3 fluxos
-    ├── Ex3/                        Exercício 3 num só script
+    ├── EXERCICIO 3/                Exercício 3 num só script
     │   ├── MiniProject_Ex3_Jose_Fernandes_Pedro_Venda.m
     │   └── Sim2FlowsDRRMP.m        3.a  Deficit Round Robin com 3 fluxos
     │
-    └── Alineas/                    Versão com um script por alínea (resultados e gráficos dos relatórios)
+    └── RESOLUÇÃO MODELO AI/        Versão com um script por alínea (resultados e gráficos dos relatórios)
         ├── Sim2Flows_newversion.m, Sim2FlowsPrio_newversion.m, Sim2FlowsDRR_newversion.m
         ├── Task1b.m … Task3e.m     Um script por alínea
         ├── Task*_resultados.mat    Resultados das simulações (50 corridas)
@@ -72,12 +72,12 @@ Todas as simulações usam **50 corridas** de **P = 100 000 pacotes**, com **int
 
 Requisitos: MATLAB com a **Statistics and Machine Learning Toolbox** (`exprnd`, `norminv`).
 
-**Um script por exercício:** abrir `WORK/Ex1`, `WORK/Ex2` ou `WORK/Ex3` e correr o script `MiniProject_Ex*_...m`. Cada secção `%%` é uma alínea e pode ser corrida sozinha com *Run Section* (Ctrl+Enter). O simulador de cada exercício tem de estar na mesma pasta do script.
+**Um script por exercício:** abrir `WORK/EXERCICIO 1`, `WORK/EXERCICIO 2` ou `WORK/EXERCICIO 3` e correr o script `MiniProject_Ex*_...m`. Cada secção `%%` é uma alínea e pode ser corrida sozinha com *Run Section* (Ctrl+Enter). O simulador de cada exercício tem de estar na mesma pasta do script.
 
 **Um script por alínea:**
 
 ```matlab
-cd('WORK/Alineas')
+cd('WORK/RESOLUÇÃO MODELO AI')
 GerarImagens      % corre todas as simulações e guarda os PNG (~35-60 min)
 ```
 
@@ -103,7 +103,7 @@ Os scripts `Task1c`, `Task2c` e `Task3e` não simulam: calculam os valores teór
 
 ### Atraso médio do Fluxo 3 com FIFO vs prioridades (1.d e 2.d)
 
-![Fluxo 3: FIFO vs PQ](WORK/Alineas/Task2d.png)
+![Fluxo 3: FIFO vs PQ](<WORK/RESOLUÇÃO MODELO AI/Task2d.png>)
 
 Com FIFO, o atraso do Fluxo 3 cresce 6 vezes entre os casos A e C, embora o seu próprio tráfego seja sempre o mesmo. Com PQ, fica praticamente constante (cerca de 1 ms).
 

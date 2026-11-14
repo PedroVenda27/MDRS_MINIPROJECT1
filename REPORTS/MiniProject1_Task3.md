@@ -14,7 +14,7 @@
 
 Em todas as simulações: 50 corridas, P = 100 000 e intervalos de confiança a 90% (média ± 1,6449·√(S²/N)).
 
-Ficheiros (pasta `WORK/Alineas/`; o simulador original está em `WORK/`):
+Ficheiros (pasta `WORK/RESOLUÇÃO MODELO AI/`; o simulador original está em `WORK/`):
 
 | Ficheiro | Alínea | O que faz |
 |---|---|---|
@@ -90,7 +90,7 @@ O `while` exterior garante que se repetem rondas até haver pelo menos um pacote
 
 ## 3.b — Caso C com Q = 1500 / 1500 / 1500
 
-![Task 3.b](../WORK/Alineas/Task3b.png)
+![Task 3.b](<../WORK/RESOLUÇÃO MODELO AI/Task3b.png>)
 
 **Resultados (média ± IC 90%):**
 
@@ -133,7 +133,7 @@ O `while` exterior garante que se repetem rondas até haver pelo menos um pacote
 
 ## 3.c — Caso D (congestionado) com Q = 1500 / 1500 / 1500
 
-![Task 3.c](../WORK/Alineas/Task3c.png)
+![Task 3.c](<../WORK/RESOLUÇÃO MODELO AI/Task3c.png>)
 
 **Resultados (média ± IC 90%):**
 
@@ -170,7 +170,7 @@ O `while` exterior garante que se repetem rondas até haver pelo menos um pacote
 
 O quantum do Fluxo 3 passa a ser 3 vezes maior. Em cada ronda pode enviar até 4500 B, enquanto os Fluxos 1 e 2 enviam até 1500 B. Os pesos ficam 1 : 1 : 3.
 
-![Task 3.d](../WORK/Alineas/Task3d.png)
+![Task 3.d](<../WORK/RESOLUÇÃO MODELO AI/Task3d.png>)
 
 **Resultados (média ± IC 90%):**
 

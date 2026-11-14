@@ -22,7 +22,7 @@ Em todas as simulações:
 - critério de paragem P = 100 000 pacotes transmitidos;
 - intervalos de confiança a 90%: média ± z₀,₉₅·√(S²/N), com z₀,₉₅ = 1,6449 (Módulo 3, slide 21).
 
-Ficheiros (pasta `WORK/Alineas/`; o simulador original está em `WORK/`):
+Ficheiros (pasta `WORK/RESOLUÇÃO MODELO AI/`; o simulador original está em `WORK/`):
 
 | Ficheiro | Alínea | O que faz |
 |---|---|---|
@@ -81,7 +81,7 @@ end
 
 O script `Task1b.m` corre `Sim2Flows_newversion([800 800 600], 10, 1e6, 1e5)` 50 vezes. Guarda cada resultado numa matriz (linha = corrida, coluna = fluxo) e calcula a média e o intervalo de confiança de cada parâmetro.
 
-![Task 1.b](../WORK/Alineas/Task1b.png)
+![Task 1.b](<../WORK/RESOLUÇÃO MODELO AI/Task1b.png>)
 
 **Resultados (média ± IC 90%):**
 
@@ -143,7 +143,7 @@ TTteo   = lambda * 8 .* EB / 1e6;          % Mbps
 ```
 `mean(...)` dá a média e o 2.º momento porque todos os tamanhos têm a mesma probabilidade.
 
-![Task 1.c](../WORK/Alineas/Task1c.png)
+![Task 1.c](<../WORK/RESOLUÇÃO MODELO AI/Task1c.png>)
 
 **Comparação com a simulação:**
 
@@ -173,7 +173,7 @@ TTteo   = lambda * 8 .* EB / 1e6;          % Mbps
 
 O script `Task1d.m` corre 50 simulações por caso (150 no total) e guarda apenas o APD e o MPD do Fluxo 3. A coluna "M/G/1" é calculada com as fórmulas da 1.c.
 
-![Task 1.d](../WORK/Alineas/Task1d.png)
+![Task 1.d](<../WORK/RESOLUÇÃO MODELO AI/Task1d.png>)
 
 | Caso | ρ | APD Fluxo 3 — simulação | APD Fluxo 3 — M/G/1 | MPD Fluxo 3 — simulação |
 |---|---|---|---|---|
