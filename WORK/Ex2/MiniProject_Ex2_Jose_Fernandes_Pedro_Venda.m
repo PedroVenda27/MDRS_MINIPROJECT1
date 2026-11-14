@@ -1,0 +1,205 @@
+flow1 = 100:1500;   %BYTES
+flow2 = 100:150;    %BYTES
+flow3 = 500:1000;   %BYTES
+flows = {flow1;flow2;flow3};
+
+p_flow1 = zeros(1,numel(flow1)) + 1/numel(flow1);
+p_flow2 = zeros(1,numel(flow2)) + 1/numel(flow2);
+p_flow3 = zeros(1,numel(flow3)) + 1/numel(flow3);
+p_flows = {p_flow1;p_flow2;p_flow3};
+
+C = 10;           %Mbps
+f = [1e6 1e6];    %B  (f1 = fila de prioridade alta, f2 = fila de prioridade baixa)
+P = 100000;
+N = 50;           % numero de simulacoes
+alfa = 0.1;       % intervalo de confianca a 90%
+
+% prioridade de cada fluxo: 1 - prioridade mais alta, 2 - segunda prioridade
+% Flow 3 tem a prioridade mais alta, Flows 1 e 2 a segunda prioridade
+prio = [2 2 1];
+
+lambda1 = [400 600 800 1000];       %pps
+lambda2 = [400 600 800 1000];       %pps
+lambda3 = [600 600 600 1000];       %pps
+v_lambda_A = [lambda1(1), lambda2(1), lambda3(1)];
+v_lambda_B = [lambda1(2), lambda2(2), lambda3(2)];
+v_lambda_C = [lambda1(3), lambda2(3), lambda3(3)];
+v_lambda_D = [lambda1(4), lambda2(4), lambda3(4)];
+v_lambda = [v_lambda_A;v_lambda_B;v_lambda_C;v_lambda_D];
+
+cases = ["A" "B" "C" "D"];
+
+%  PL   - row vector with the packet loss (%) of each flow
+%  APD  - row vector with the average packet delay (milliseconds) of each flow
+%  MPD  - maximum packet delay (milliseconds) of each flow
+%  TT   - transmitted throughput (Mbps) of each flow
+
+
+%% 2.a
+% O simulador com prioridades esta no ficheiro Sim2FlowsPrioMP.m (na mesma
+% pasta). Foi feito a partir do Sim2FlowsMP do exercicio 1:
+%  - uma fila por prioridade (QUEUE{1} prioridade alta, QUEUE{2} baixa)
+%  - cada pacote vai para a fila da sua prioridade (vetor prio)
+%  - no fim de cada transmissao, o proximo pacote sai da fila de
+%    prioridade mais alta que nao esteja vazia
+
+
+%% 2.b
+% alocação de recursos
+packet_loss = zeros(N, 3);
+packet_delay = zeros(N, 3);
+max_packet_delay= zeros(N, 3);
+throughput = zeros(N, 3);
+
+for i = 1:N
+    [PL, APD, MPD, TT] = Sim2FlowsPrioMP(v_lambda_C,C,f,P,flows,prio);
+    packet_loss(i, :) = PL;
+    packet_delay(i, :) = APD;
+    max_packet_delay(i, :)= MPD;
+    throughput(i, :) = TT;
+    fprintf("%d\n", i);
+end
+
+% media e intervalo de confianca a 90% (Modulo 3, slide 21)
+avg_packet_loss = mean(packet_loss);
+avg_packet_delay = mean(packet_delay);
+avg_max_packet_delay = mean(max_packet_delay);
+avg_throughput = mean(throughput);
+term_packet_loss = norminv(1-alfa/2)*sqrt(var(packet_loss)/N);
+term_packet_delay = norminv(1-alfa/2)*sqrt(var(packet_delay)/N);
+term_max_packet_delay = norminv(1-alfa/2)*sqrt(var(max_packet_delay)/N);
+term_throughput = norminv(1-alfa/2)*sqrt(var(throughput)/N);
+
+for i = 1:3
+    fprintf("Flow %d:\n Avg. Packet loss (%%) = %.3e +- %.3e\n Avg. Packet Delay (ms) = %.3e +- %.3e\n Max. Packet Delay (ms) = %.3e +- %.3e\n Troughput (Mbps) = %.3e +- %.3e\n", ...
+        i, avg_packet_loss(i), term_packet_loss(i), avg_packet_delay(i), term_packet_delay(i), ...
+        avg_max_packet_delay(i), term_max_packet_delay(i), avg_throughput(i), term_throughput(i));
+end
+
+% graficos: barras com a media e barras de erro com o intervalo de confianca
+figure;
+names = ["Packet loss (%)" "Avg. packet delay (ms)" "Max. packet delay (ms)" "Throughput (Mbps)"];
+avgs = {avg_packet_loss, avg_packet_delay, avg_max_packet_delay, avg_throughput};
+terms = {term_packet_loss, term_packet_delay, term_max_packet_delay, term_throughput};
+for k = 1:4
+    subplot(2,2,k);
+    bar(1:3, avgs{k});
+    hold on
+    errorbar(1:3, avgs{k}, terms{k}, terms{k}, 'k.', 'LineWidth', 1.2);
+    hold off
+    grid on
+    xticks(1:3)
+    xticklabels(["Flow 1" "Flow 2" "Flow 3"])
+    ylabel(names(k))
+end
+sgtitle('2.b - Priority Queuing, case C');
+
+% guardar a media do atraso para comparar com a teoria na 2.c
+sim_packet_delay = avg_packet_delay;
+sim_term_packet_delay = term_packet_delay;
+
+
+%% 2.c
+% M/G/1 com prioridades (Modulo 4, slide 7)
+% media e 2o momento do tempo de transmissao de cada fluxo
+ES = zeros(1,3);
+ES2 = zeros(1,3);
+for k = 1:3
+    S = 8*flows{k}/(C*1e6);                  % tempo de transmissao de cada tamanho (s)
+    ES(k) = sum(S.*p_flows{k});              % E[S]
+    ES2(k) = sum(S.^2.*p_flows{k});          % E[S^2]
+end
+
+rho = v_lambda_C.*ES;                        % ocupacao de cada fluxo
+num = sum(v_lambda_C.*ES2);                  % soma de TODOS os fluxos
+
+rho_alta = sum(rho(prio==1));                % prioridade 1: Flow 3
+rho_baixa = sum(rho(prio==2));               % prioridade 2: Flows 1 e 2
+
+WQ_alta = num/(2*(1-rho_alta));
+WQ_baixa = num/(2*(1-rho_alta)*(1-rho_alta-rho_baixa));
+
+WQ = zeros(1,3);
+WQ(prio==1) = WQ_alta;
+WQ(prio==2) = WQ_baixa;
+theory_packet_delay = (WQ + ES)*1000;        % ms
+
+for i = 1:3
+    fprintf("Flow %d:\n Theoretical Avg. Packet Delay (ms) = %.3e\n", i, theory_packet_delay(i));
+end
+
+% comparacao com a simulacao da 2.b (se ja tiver sido corrida)
+if exist('sim_packet_delay', 'var')
+    figure;
+    bar(1:3, sim_packet_delay);
+    hold on
+    errorbar(1:3, sim_packet_delay, sim_term_packet_delay, sim_term_packet_delay, 'k.', 'LineWidth', 1.2);
+    plot(1:3, theory_packet_delay, 'rx', 'MarkerSize', 12, 'LineWidth', 2);
+    hold off
+    grid on
+    xticks(1:3)
+    xticklabels(["Flow 1" "Flow 2" "Flow 3"])
+    ylabel('Avg. packet delay (ms)')
+    legend('Simulation', '90% CI', 'M/G/1 with priorities', 'Location', 'north');
+    title('2.c - Simulation vs M/G/1 with priorities (case C)');
+end
+
+
+%% 2.d
+% alocação de recursos
+packet_loss = zeros(3*N, 3);
+packet_delay = zeros(3*N, 3);
+max_packet_delay= zeros(3*N, 3);
+throughput = zeros(3*N, 3);
+avg_packet_delay = zeros(1,3);
+avg_max_packet_delay = zeros(1,3);
+term_packet_delay = zeros(1,3);
+term_max_packet_delay = zeros(1,3);
+
+for i = 1:3*N
+    if (i<=N)
+        [PL, APD, MPD, TT] = Sim2FlowsPrioMP(v_lambda_A,C,f,P,flows,prio);
+    elseif (i>N) && (i<=2*N)
+        [PL, APD, MPD, TT] = Sim2FlowsPrioMP(v_lambda_B,C,f,P,flows,prio);
+    else
+        [PL, APD, MPD, TT] = Sim2FlowsPrioMP(v_lambda_C,C,f,P,flows,prio);
+    end
+    packet_loss(i, :) = PL;
+    packet_delay(i, :) = APD;
+    max_packet_delay(i, :)= MPD;
+    throughput(i, :) = TT;
+    fprintf("%d\n", i);
+end
+
+% so interessa o Flow 3 (coluna 3), um valor por caso
+for c = 1:3
+    start = N*(c-1) + 1;
+    avg_packet_delay(c) = mean(packet_delay(start:N*c,3));
+    avg_max_packet_delay(c) = mean(max_packet_delay(start:N*c,3));
+    term_packet_delay(c) = norminv(1-alfa/2)*sqrt(var(packet_delay(start:N*c,3))/N);
+    term_max_packet_delay(c) = norminv(1-alfa/2)*sqrt(var(max_packet_delay(start:N*c,3))/N);
+    fprintf("Case %s:\n", cases(c))
+    fprintf("Flow 3:\n Avg. Packet Delay (ms) = %.3e +- %.3e\n Max. Packet Delay (ms) = %.3e +- %.3e\n\n", ...
+        avg_packet_delay(c), term_packet_delay(c), avg_max_packet_delay(c), term_max_packet_delay(c));
+end
+
+figure;
+subplot(1,2,1);
+bar(1:3, avg_packet_delay);
+hold on
+errorbar(1:3, avg_packet_delay, term_packet_delay, term_packet_delay, 'k.', 'LineWidth', 1.2);
+hold off
+grid on
+xticks(1:3)
+xticklabels(["Case A" "Case B" "Case C"])
+ylabel('Avg. packet delay of Flow 3 (ms)')
+subplot(1,2,2);
+bar(1:3, avg_max_packet_delay);
+hold on
+errorbar(1:3, avg_max_packet_delay, term_max_packet_delay, term_max_packet_delay, 'k.', 'LineWidth', 1.2);
+hold off
+grid on
+xticks(1:3)
+xticklabels(["Case A" "Case B" "Case C"])
+ylabel('Max. packet delay of Flow 3 (ms)')
+sgtitle('2.d - Flow 3 with Priority Queuing');
