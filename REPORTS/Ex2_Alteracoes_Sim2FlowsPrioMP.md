@@ -59,8 +59,8 @@ function [PL , APD , MPD , TT] = Sim2FlowsMP(lambda,C,f,P,flows)
 ```matlab
 function [PL , APD , MPD , TT] = Sim2FlowsPrioMP(lambda,C,f,P,flows,prio)
 % ...
-%  f      - row vector with the size (Bytes) of each priority queue
-%  prio   - row vector with the priority of each flow (1 - highest)
+%  f      - tamanho de cada fila de prioridade (Bytes)
+%  prio   - prioridade de cada fluxo (1 = alta)
 ```
 
 **Porquê:**
@@ -95,9 +95,9 @@ queue_count = 0;     % Tracks current number of packets in queue
 
 **Depois:**
 ```matlab
-QUEUEOCCUPATION= zeros(1,PRIO_NUM); % Occupation of each queue (in Bytes)
-QUEUE = cell(1,PRIO_NUM);           % Size, arriving time instant and flowID of each queued packet
-queue_count = zeros(1,PRIO_NUM);    % Tracks current number of packets in each queue
+QUEUEOCCUPATION= zeros(1,PRIO_NUM);   % ocupação de cada fila (Bytes)
+QUEUE = cell(1,PRIO_NUM);   % tamanho, instante de chegada e fluxo
+queue_count = zeros(1,PRIO_NUM);   % nº de pacotes em cada fila
 for q = 1:PRIO_NUM
     QUEUE{q} = zeros(P,3);
 end
