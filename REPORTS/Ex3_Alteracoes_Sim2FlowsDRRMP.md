@@ -1,35 +1,45 @@
 # Exercício 3.a — Alterações ao simulador
 
-**Partimos de:** `WORK/Sim2Flows_original.m` (o simulador que nos foi dado, FIFO com 2 fluxos)
+**Partimos de:** `WORK/EXERCICIO 1/Sim2FlowsMP.m` (o nosso simulador do exercício 1, FIFO com 3 fluxos)
 **Chegámos a:** `WORK/EXERCICIO 3/Sim2FlowsDRRMP.m` (Deficit Round Robin com 3 fluxos)
 
-Neste exercício tínhamos de fazer uma nova versão do simulador com 3 fluxos a usar **Deficit Round Robin (DRR)**. Em cada ronda, os fluxos são servidos **pela ordem do ID** (1, 2, 3).
+Neste exercício tínhamos de fazer um simulador com 3 fluxos a usar **Deficit Round Robin (DRR)**. Em cada ronda, os fluxos são servidos **pela ordem do ID** (1, 2, 3).
 
-Os números de linha são dos ficheiros como estão agora. No original, a função aparece como `Sim2Flows_original` porque mudámos o nome ao ficheiro; na versão do professor chamava-se `Sim2Flows`.
+**Porque partimos do exercício 1:** o enunciado fala numa nova versão do `Sim2FlowsDRR` da Prática 2. Nós decidimos partir do `Sim2FlowsMP`, porque já tinha tudo o que era preciso para os 3 fluxos:
+- o parâmetro `flows`;
+- os contadores com uma posição por fluxo;
+- a primeira chegada de cada fluxo;
+- o `min` em vez do `sortrows`;
+- a fila pré-alocada;
+- o gerador de tamanhos.
+
+Essas alterações estão explicadas no documento do exercício 1 ([Ex1_Alteracoes_Sim2FlowsMP.md](Ex1_Alteracoes_Sim2FlowsMP.md)). Aqui só descrevemos **o que mudámos para ter DRR**.
+
+Os números de linha são dos ficheiros como estão agora.
 
 ## Resumo
 
-| # | O que alterámos | Linhas no original | Linhas na nossa versão |
+| # | O que alterámos | Linhas no Sim2FlowsMP | Linhas na nossa versão |
 |---|---|---|---|
-| 1 | Acrescentámos os parâmetros `flows` e `Quantum` e passámos `f` a vetor | 1 | 1–8 |
-| 2 | Calculamos o número de fluxos a partir dos argumentos | — | 15 |
-| 3 | Pusemos uma fila por fluxo, pré-alocada | 19–20 | 23–30 |
-| 4 | Criámos a fila final e o crédito de cada fluxo | — | 31–32 |
-| 5 | Pusemos os contadores com uma posição por fluxo | 23–28 | 35–40 |
-| 6 | Criamos a primeira chegada de cada fluxo num ciclo | 40–44 | 45–50 |
-| 7 | Trocámos o `sortrows` por um `min` | 48–54 | 54–61 |
-| 8 | Geramos o tamanho do pacote a partir do seu fluxo | 59–63 | 67 |
-| 9 | Na chegada, o pacote vai para a fila do seu fluxo | 69–74 | 73–80 |
-| 10 | Na partida, fazemos uma ronda DRR quando a fila final está vazia | — | 89–115 |
-| 11 | O próximo pacote a transmitir sai da fila final | 83–92 | 116–125 |
-| 12 | Simplificámos o gerador de tamanhos | 104–120 | 137–139 |
+| 1 | Acrescentámos o parâmetro `Quantum` e passámos `f` a vetor | 1–7 | 1–8 |
+| 2 | Trocámos a fila única por uma fila por fluxo | 22–27 | 23–30 |
+| 3 | Criámos a fila final e o crédito de cada fluxo | — | 31–32 |
+| 4 | Na chegada, o pacote vai para a fila do seu fluxo | 85–92 | 73–80 |
+| 5 | Na partida, fazemos uma ronda DRR quando a fila final está vazia | — | 89–115 |
+| 6 | O próximo pacote a transmitir sai da fila final | 101–114 | 116–125 |
 
-**O que deixámos como estava**, porque já funcionava para o que precisávamos:
-- os eventos `ARRIVAL` e `DEPARTURE` (linhas 18–19);
+**O que deixámos igual ao `Sim2FlowsMP`:**
+- os eventos e a lista de eventos;
+- o `FLOW_NUM` (linha 15);
+- os contadores estatísticos (linhas 35–40);
+- a primeira chegada de cada fluxo (linhas 45–50);
+- a escolha do próximo evento com `min` (linhas 54–61);
+- a geração do tamanho do pacote (linha 67);
 - a transmissão imediata quando a ligação está livre (linhas 69–71);
 - a atualização dos contadores na partida (linhas 83–88);
 - o critério de paragem (linha 53);
-- o cálculo de PL, APD, MPD e TT no fim (linhas 130–133).
+- o cálculo de PL, APD, MPD e TT (linhas 130–133);
+- o `GenerateSize` (linhas 137–139).
 
 ---
 
@@ -38,11 +48,13 @@ Os números de linha são dos ficheiros como estão agora. No original, a funç�
 Clica numa alteração para a abrir.
 
 <details>
-<summary><b>1. Parâmetros de entrada — linha 1 (original) → linhas 1–8 (nossa versão)</b></summary>
+<summary><b>1. Parâmetros de entrada — linhas 1–7 (Sim2FlowsMP) → linhas 1–8 (nossa versão)</b></summary>
 
 **Antes:**
 ```matlab
-function [PL , APD , MPD , TT] = Sim2Flows(lambda,C,f,P)
+function [PL , APD , MPD , TT] = Sim2FlowsMP(lambda,C,f,P,flows)
+% ...
+%  f      - queue size (Bytes)
 ```
 
 **Depois:**
@@ -50,12 +62,10 @@ function [PL , APD , MPD , TT] = Sim2Flows(lambda,C,f,P)
 function [PL , APD , MPD , TT] = Sim2FlowsDRRMP(lambda,C,f,P,flows,Quantum)
 % ...
 %  f       - row vector with the queue size (Bytes) of each flow
-%  flows   - cell array with the possible packet sizes (Bytes) of each flow
 %  Quantum - row vector with the DRR quantum (Bytes) of each flow
 ```
 
 **Porquê:**
-- **`flows`:** tal como no exercício 2, não queríamos ter os tamanhos dos pacotes escritos dentro do simulador, por isso passamo-los como argumento. No script fazemos `flows = {100:1500; 100:150; 500:1000}`.
 - **`Quantum`:** no DRR, cada fluxo tem um quantum, que é o número de bytes que pode enviar em cada ronda. Passámo-lo como argumento porque o enunciado pede experiências com quanta diferentes:
   - na 3.b e na 3.c usamos `[1500 1500 1500]`;
   - na 3.d usamos `[1500 1500 4500]`.
@@ -66,26 +76,13 @@ function [PL , APD , MPD , TT] = Sim2FlowsDRRMP(lambda,C,f,P,flows,Quantum)
 </details>
 
 <details>
-<summary><b>2. Número de fluxos — linha nova 15</b></summary>
-
-**Antes:** não havia. O número de fluxos (2) estava escrito diretamente no código.
-
-**Depois:**
-```matlab
-FLOW_NUM = length(flows);
-```
-
-**Porquê:** assim o simulador percebe sozinho quantos fluxos tem (3). No DRR há uma fila por fluxo, por isso este valor também nos diz quantas filas temos de criar.
-
-</details>
-
-<details>
-<summary><b>3. Uma fila por fluxo — linhas 19–20 (original) → linhas 23–30 (nossa versão)</b></summary>
+<summary><b>2. Uma fila por fluxo — linhas 22–27 (Sim2FlowsMP) → linhas 23–30 (nossa versão)</b></summary>
 
 **Antes:**
 ```matlab
 QUEUEOCCUPATION= 0; % Occupation of the queue (in Bytes)
-QUEUE= [];          % Size, arriving time instant and flowID of each packet in the queue
+QUEUE = zeros(P,3);
+queue_count = 0;     % Tracks current number of packets in queue
 ```
 
 **Depois:**
@@ -98,14 +95,12 @@ for q = 1:FLOW_NUM
 end
 ```
 
-**Porquê:**
-- **Uma fila por fluxo:** os algoritmos do tipo round robin funcionam com uma fila para cada fluxo (Módulo 4, slide 18). Por isso trocámos a fila única por um cell array: `QUEUE{1}`, `QUEUE{2}` e `QUEUE{3}` são as filas dos Fluxos 1, 2 e 3. Cada uma tem a sua ocupação em `QUEUEOCCUPATION(q)`, para controlarmos o limite de cada fila em separado.
-- **Pré-alocação:** criamos cada fila logo com P linhas e usamos `queue_count(q)` para saber quantas estão ocupadas. No original, a fila crescia uma linha de cada vez, o que torna a simulação muito mais lenta.
+**Porquê:** os algoritmos do tipo round robin funcionam com uma fila para cada fluxo (Módulo 4, slide 18). Por isso trocámos a fila única por um cell array: `QUEUE{1}`, `QUEUE{2}` e `QUEUE{3}` são as filas dos Fluxos 1, 2 e 3. A ocupação e o contador de pacotes passaram a vetores, com um valor por fila. Mantivemos a pré-alocação do exercício 1.
 
 </details>
 
 <details>
-<summary><b>4. Fila final e crédito de cada fluxo — linhas novas 31–32</b></summary>
+<summary><b>3. Fila final e crédito de cada fluxo — linhas novas 31–32</b></summary>
 
 **Antes:** não existiam.
 
@@ -122,113 +117,13 @@ CREDIT = zeros(1,FLOW_NUM);         % DRR credit (deficit counter) of each flow 
 </details>
 
 <details>
-<summary><b>5. Contadores estatísticos — linhas 23–28 (original) → linhas 35–40 (nossa versão)</b></summary>
-
-**Antes:**
-```matlab
-TOTALPACKETS= zeros(1,2);
-LOSTPACKETS= zeros(1,2);
-TRANSPACKETS= zeros(1,2);
-TRANSBYTES= zeros(1,2);
-DELAYS= zeros(1,2);
-MAXDELAY= zeros(1,2);
-```
-
-**Depois:**
-```matlab
-TOTALPACKETS= zeros(1,FLOW_NUM);
-LOSTPACKETS= zeros(1,FLOW_NUM);
-TRANSPACKETS= zeros(1,FLOW_NUM);
-TRANSBYTES= zeros(1,FLOW_NUM);
-DELAYS= zeros(1,FLOW_NUM);
-MAXDELAY= zeros(1,FLOW_NUM);
-```
-
-**Porquê:** cada posição destes vetores guarda os valores de um fluxo, e como passámos a ter 3 fluxos precisávamos de 3 posições. Com `FLOW_NUM`, o tamanho acerta-se sozinho.
-
-</details>
-
-<details>
-<summary><b>6. Primeira chegada de cada fluxo — linhas 40–44 (original) → linhas 45–50 (nossa versão)</b></summary>
-
-**Antes:**
-```matlab
-tmp= Clock + exprnd(1/lambda(1));
-EventList = [ARRIVAL, tmp, GenerateSize1(), 1, tmp];
-tmp= Clock + exprnd(1/lambda(2));
-EventList = [EventList; ARRIVAL, tmp, GenerateSize2(), 2, tmp];
-```
-
-**Depois:**
-```matlab
-EventList = zeros(FLOW_NUM, 5);
-for k = 1:FLOW_NUM
-    tmp = Clock + exprnd(1/lambda(k));
-    EventList(k,:) = [ARRIVAL, tmp, GenerateSize(flows{k}), k, tmp];
-end
-```
-
-**Porquê:** a simulação tem de começar com uma chegada de cada fluxo. O original só criava as dos fluxos 1 e 2, por isso, se não mudássemos isto, o Fluxo 3 nunca chegava a ter pacotes. Com o ciclo, criamos a primeira chegada de todos os fluxos de uma vez.
-
-</details>
-
-<details>
-<summary><b>7. Escolha do próximo evento — linhas 48–54 (original) → linhas 54–61 (nossa versão)</b></summary>
-
-**Antes:**
-```matlab
-EventList= sortrows(EventList,2);
-Event= EventList(1,1);
-Clock= EventList(1,2);
-PacketSize= EventList(1,3);
-Flow= EventList(1,4);
-ArrInstant= EventList(1,5);
-EventList(1,:)= [];
-```
-
-**Depois:**
-```matlab
-[~, idx] = min(EventList(:,2));
-Event      = EventList(idx, 1);
-Clock      = EventList(idx, 2);
-PacketSize = EventList(idx, 3);
-Flow       = EventList(idx, 4);
-ArrInstant = EventList(idx, 5);
-EventList(idx, :) = [];
-```
-
-**Porquê:** isto é só para a simulação correr mais depressa. O resultado é igual, porque o próximo evento continua a ser o de menor instante, mas assim não ordenamos a lista toda em cada iteração; basta encontrar o mínimo. Com 50 corridas de 100 000 pacotes por experiência, isto poupa bastante tempo (cada corrida demora cerca de 2 s).
-
-</details>
-
-<details>
-<summary><b>8. Tamanho do próximo pacote — linhas 59–63 (original) → linha 67 (nossa versão)</b></summary>
-
-**Antes:**
-```matlab
-if Flow==1
-    nextPacketSize= GenerateSize1();
-else
-    nextPacketSize= GenerateSize2();
-end
-```
-
-**Depois:**
-```matlab
-nextPacketSize= GenerateSize(flows{Flow});
-```
-
-**Porquê:** o `if/else` só separava 2 fluxos. Com 3 fluxos, o Fluxo 3 ia cair no `else` e ser tratado como se fosse o Fluxo 2. Agora geramos o tamanho a partir dos tamanhos do próprio fluxo (`flows{Flow}`).
-
-</details>
-
-<details>
-<summary><b>9. Chegada com a ligação ocupada — linhas 69–74 (original) → linhas 73–80 (nossa versão)</b></summary>
+<summary><b>4. Chegada com a ligação ocupada — linhas 85–92 (Sim2FlowsMP) → linhas 73–80 (nossa versão)</b></summary>
 
 **Antes:**
 ```matlab
 if QUEUEOCCUPATION + PacketSize <= f
-    QUEUE= [QUEUE; PacketSize , Clock, Flow];
+    queue_count = queue_count + 1;
+    QUEUE(queue_count, :) = [PacketSize , Clock, Flow];
     QUEUEOCCUPATION= QUEUEOCCUPATION + PacketSize;
 else
     LOSTPACKETS(Flow)= LOSTPACKETS(Flow) + 1;
@@ -247,16 +142,15 @@ end
 ```
 
 **Porquê:**
-- O pacote vai para a fila do **seu** fluxo (`QUEUE{Flow}`), e não para uma fila onde estão todos misturados.
+- O pacote vai para a fila do **seu** fluxo (`QUEUE{Flow}`), e não para a fila única onde estavam todos misturados.
 - Só se perde o pacote se **a fila do seu fluxo** estiver cheia (`f(Flow)`). Isto é importante no caso D (congestionado): os fluxos que mandam demasiado tráfego enchem a sua própria fila, mas não tiram espaço aos outros. Por exemplo, o Fluxo 2 não perde pacotes mesmo com as filas dos Fluxos 1 e 3 cheias.
-- Como a fila está pré-alocada, metemos o pacote na primeira posição livre (`queue_count(Flow)`).
 
 </details>
 
 <details>
-<summary><b>10. Ronda DRR — linhas novas 89–115</b></summary>
+<summary><b>5. Ronda DRR — linhas novas 89–115</b></summary>
 
-**Antes:** não existia. No original, quando acabava uma transmissão, passava logo o primeiro pacote da fila única.
+**Antes:** não existia. No `Sim2FlowsMP`, quando acabava uma transmissão, passava logo o primeiro pacote da fila única.
 
 **Depois:**
 ```matlab
@@ -299,7 +193,7 @@ end
 </details>
 
 <details>
-<summary><b>11. Próximo pacote a transmitir — linhas 83–92 (original) → linhas 116–125 (nossa versão)</b></summary>
+<summary><b>6. Próximo pacote a transmitir — linhas 101–114 (Sim2FlowsMP) → linhas 116–125 (nossa versão)</b></summary>
 
 **Antes:**
 ```matlab
@@ -309,7 +203,10 @@ if QUEUEOCCUPATION > 0
     QFlow= QUEUE(1,3);
     EventList = [EventList; DEPARTURE, Clock + 8*QSize/(C*1e6), QSize, QFlow, QInstant];
     QUEUEOCCUPATION= QUEUEOCCUPATION - QSize;
-    QUEUE(1,:)= [];
+    if queue_count > 1
+        QUEUE(1:queue_count-1, :) = QUEUE(2:queue_count, :);
+    end
+    queue_count = queue_count - 1;
 else
     STATE= 0;
 end
@@ -330,47 +227,7 @@ end
 
 **Porquê:**
 - No DRR, os pacotes são sempre transmitidos **a partir da fila final**, pela ordem em que lá foram postos na ronda: primeiro os do Fluxo 1, depois os do 2, depois os do 3. Por isso o próximo pacote é sempre o primeiro da `FINALQUEUE`.
-- Aqui já não mexemos em `QUEUEOCCUPATION`, porque o espaço na fila do fluxo foi libertado quando o pacote passou para a fila final (alteração 10).
-- O algoritmo continua a ser ***work conserving***: a ligação só fica livre (`STATE= 0`) quando a fila final e todas as filas dos fluxos estão vazias, porque a ronda da alteração 10 só deixa a fila final vazia se não houver pacotes em lado nenhum.
-
-</details>
-
-<details>
-<summary><b>12. Gerador de tamanhos — linhas 104–120 (original) → linhas 137–139 (nossa versão)</b></summary>
-
-**Antes:**
-```matlab
-function out= GenerateSize1()
-    aux= rand();
-    aux2= [65:109 111:1517];
-    if aux <= 0.19
-        out= 64;
-    elseif aux <= 0.19 + 0.23
-        out= 110;
-    elseif aux <= 0.19 + 0.23 + 0.17
-        out= 1518;
-    else
-        out = aux2(randi(length(aux2)));
-    end
-end
-
-function out= GenerateSize2()
-    out= randi([110 130]);
-end
-```
-
-**Depois:**
-```matlab
-function out= GenerateSize(flow)
-    out= randi([flow(1) flow(length(flow))]);
-end
-```
-
-**Porquê:** as duas funções do original tinham as distribuições do exemplo das aulas, que não são as que o enunciado pede. No Mini-Projeto, os 3 fluxos têm todos os tamanhos com a mesma probabilidade:
-- Fluxo 1: 100–1500 B;
-- Fluxo 2: 100–150 B;
-- Fluxo 3: 500–1000 B.
-
-Por isso chegou-nos uma só função, que faz um `randi` entre o tamanho mínimo e o máximo de cada fluxo (Módulo 3, slide 13).
+- Aqui já não mexemos em `QUEUEOCCUPATION` nem em `queue_count`, porque isso já foi feito quando o pacote passou para a fila final (alteração 5).
+- O algoritmo continua a ser ***work conserving***: a ligação só fica livre (`STATE= 0`) quando a fila final e todas as filas dos fluxos estão vazias, porque a ronda da alteração 5 só deixa a fila final vazia se não houver pacotes em lado nenhum.
 
 </details>
