@@ -31,7 +31,12 @@ Os números de linha são dos ficheiros como estão agora. No original, a funç�
 
 ---
 
-## 1. Parâmetros de entrada — linha 1 (original) → linhas 1–8 (nossa versão)
+## Detalhe de cada alteração
+
+Clica numa alteração para a abrir.
+
+<details>
+<summary><b>1. Parâmetros de entrada — linha 1 (original) → linhas 1–8 (nossa versão)</b></summary>
 
 **Antes:**
 ```matlab
@@ -52,9 +57,10 @@ function [PL , APD , MPD , TT] = Sim2FlowsPrioMP(lambda,C,f,P,flows,prio)
 - **`prio`:** criámos este vetor para dizer qual a prioridade de cada fluxo. No script usamos `prio = [2 2 1]`: o Fluxo 3 vai para a fila 1 (prioridade alta) e os Fluxos 1 e 2 vão para a fila 2. Se quisermos trocar as prioridades, basta mudar o vetor, sem mexer no simulador.
 - **`f`:** passou de um valor único para um vetor com um tamanho para cada fila. O enunciado pedia f₁ = f₂ = 1 000 000 Bytes, por isso no script passamos `f = [1e6 1e6]`.
 
----
+</details>
 
-## 2. Número de fluxos e de prioridades — linhas novas 15–16
+<details>
+<summary><b>2. Número de fluxos e de prioridades — linhas novas 15–16</b></summary>
 
 **Antes:** não havia nada disto. O número de fluxos (2) estava escrito diretamente no código.
 
@@ -66,9 +72,10 @@ PRIO_NUM = max(prio);
 
 **Porquê:** assim o simulador percebe sozinho quantos fluxos tem (3) e quantas filas de prioridade são precisas (2). Usamos estes valores mais à frente para criar as filas e os contadores com o tamanho certo.
 
----
+</details>
 
-## 3. Uma fila por prioridade — linhas 19–20 (original) → linhas 24–31 (nossa versão)
+<details>
+<summary><b>3. Uma fila por prioridade — linhas 19–20 (original) → linhas 24–31 (nossa versão)</b></summary>
 
 **Antes:**
 ```matlab
@@ -94,9 +101,10 @@ end
   Cada fila tem a sua ocupação em `QUEUEOCCUPATION(q)`, para controlarmos o limite de cada uma em separado.
 - **Pré-alocação:** criamos cada fila logo com P linhas e usamos `queue_count(q)` para saber quantas estão ocupadas. No original, a fila crescia uma linha de cada vez (`QUEUE= [QUEUE; ...]`), o que torna a simulação bem mais lenta.
 
----
+</details>
 
-## 4. Contadores estatísticos — linhas 23–28 (original) → linhas 34–39 (nossa versão)
+<details>
+<summary><b>4. Contadores estatísticos — linhas 23–28 (original) → linhas 34–39 (nossa versão)</b></summary>
 
 **Antes:**
 ```matlab
@@ -120,9 +128,10 @@ MAXDELAY= zeros(1,FLOW_NUM);
 
 **Porquê:** cada posição destes vetores guarda os valores de um fluxo, e como passámos a ter 3 fluxos precisávamos de 3 posições. Com `FLOW_NUM`, o tamanho acerta-se sozinho e não temos de mudar nada se o número de fluxos mudar.
 
----
+</details>
 
-## 5. Primeira chegada de cada fluxo — linhas 40–44 (original) → linhas 44–49 (nossa versão)
+<details>
+<summary><b>5. Primeira chegada de cada fluxo — linhas 40–44 (original) → linhas 44–49 (nossa versão)</b></summary>
 
 **Antes:**
 ```matlab
@@ -143,9 +152,10 @@ end
 
 **Porquê:** a simulação tem de começar com uma chegada de cada fluxo. O original só criava as dos fluxos 1 e 2, por isso, se não mudássemos isto, o Fluxo 3 nunca chegava a ter pacotes. Com o ciclo, criamos a primeira chegada de todos os fluxos de uma vez.
 
----
+</details>
 
-## 6. Escolha do próximo evento — linhas 48–54 (original) → linhas 53–60 (nossa versão)
+<details>
+<summary><b>6. Escolha do próximo evento — linhas 48–54 (original) → linhas 53–60 (nossa versão)</b></summary>
 
 **Antes:**
 ```matlab
@@ -171,9 +181,10 @@ EventList(idx, :) = [];
 
 **Porquê:** isto é só para a simulação correr mais depressa. O resultado é igual, porque o próximo evento continua a ser o de menor instante, mas assim não ordenamos a lista toda em cada iteração; basta encontrar o mínimo. Cada corrida passou de cerca de 3,5 s para cerca de 1,3 s, e isso nota-se bastante quando temos de fazer 50 corridas de 100 000 pacotes por experiência.
 
----
+</details>
 
-## 7. Tamanho do próximo pacote — linhas 59–63 (original) → linha 66 (nossa versão)
+<details>
+<summary><b>7. Tamanho do próximo pacote — linhas 59–63 (original) → linha 66 (nossa versão)</b></summary>
 
 **Antes:**
 ```matlab
@@ -191,9 +202,10 @@ nextPacketSize= GenerateSize(flows{Flow});
 
 **Porquê:** o `if/else` só separava 2 fluxos. Com 3 fluxos, o Fluxo 3 ia cair no `else` e ser tratado como se fosse o Fluxo 2. Agora geramos o tamanho a partir dos tamanhos do próprio fluxo (`flows{Flow}`), por isso funciona com qualquer número de fluxos.
 
----
+</details>
 
-## 8. Chegada com a ligação ocupada — linhas 69–74 (original) → linhas 72–80 (nossa versão)
+<details>
+<summary><b>8. Chegada com a ligação ocupada — linhas 69–74 (original) → linhas 72–80 (nossa versão)</b></summary>
 
 **Antes:**
 ```matlab
@@ -222,9 +234,10 @@ end
 - Só se perde o pacote se **essa** fila estiver cheia (`f(q)`). Assim, os Fluxos 1 e 2 nunca ocupam espaço na fila do Fluxo 3, nem o contrário.
 - Como a fila está pré-alocada, metemos o pacote na primeira posição livre (`queue_count(q)`).
 
----
+</details>
 
-## 9. Escolha do próximo pacote a transmitir — linhas 83–92 (original) → linhas 89–103 (nossa versão)
+<details>
+<summary><b>9. Escolha do próximo pacote a transmitir — linhas 83–92 (original) → linhas 89–103 (nossa versão)</b></summary>
 
 **Antes:**
 ```matlab
@@ -265,9 +278,10 @@ end
 - Também é ***work conserving*** (Módulo 4, slide 4): a ligação só fica livre (`STATE= 0`) quando as duas filas estão vazias.
 - Como a fila está pré-alocada, para tirar o primeiro pacote subimos as linhas de baixo uma posição e diminuímos `queue_count(q)`, em vez de apagar a linha com `QUEUE(1,:)= []`, como estava no original.
 
----
+</details>
 
-## 10. Gerador de tamanhos — linhas 104–120 (original) → linhas 115–117 (nossa versão)
+<details>
+<summary><b>10. Gerador de tamanhos — linhas 104–120 (original) → linhas 115–117 (nossa versão)</b></summary>
 
 **Antes:**
 ```matlab
@@ -303,3 +317,5 @@ end
 - Fluxo 3: 500–1000 B.
 
 Por isso chegou-nos uma só função, que faz um `randi` entre o tamanho mínimo e o máximo de cada fluxo (Módulo 3, slide 13).
+
+</details>
