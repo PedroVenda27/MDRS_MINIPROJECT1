@@ -180,14 +180,16 @@ D & 1000 & 1000 & 1000 & 1,340 (congestionado) \\
 
 \subsection{Metodologia}
 
-Em todas as experiências corremos $N = 50$ simulações, cada uma com o critério de paragem $P = 100\,000$ pacotes transmitidos. Para cada parâmetro de desempenho apresentamos a média das 50 simulações e o intervalo de confiança a 90\% (Módulo 3):
+Em todas as experiências corremos $N = 50$ simulações, cada uma com o critério de paragem $P = 100\,000$ pacotes transmitidos. Para cada parâmetro de desempenho apresentamos a média das 50 simulações e o intervalo de confiança a 90\%:
 \begin{equation}
 \bar{X}(N) \pm z_{1-\alpha/2}\sqrt{\frac{S^2(N)}{N}}, \qquad \alpha = 0{,}1, \quad z_{0{,}95} = 1{,}6449
 \end{equation}
 
-Os parâmetros estimados para cada fluxo são: a perda de pacotes PL (\%), o atraso médio APD (ms), o atraso máximo MPD (ms) e o \textit{throughput} transmitido TT (Mbps). Nos gráficos, as barras são a média e as barras de erro são o intervalo de confiança.
+Os parâmetros estimados para cada fluxo são: a perda de pacotes PL (\%), o atraso médio APD (ms), o atraso máximo MPD (ms) e o \textit{throughput} transmitido TT (Mbps).
 
-Cada exercício tem um script (\code{MiniProject\_ExN\_Jose\_Fernandes\_Pedro\_Venda.m}) e o respetivo simulador. O código completo está no Anexo~\ref{sec:anexo}.
+Nos gráficos, as barras são a média e as barras de erro são o intervalo de confiança.
+
+Cada exercício é composto por um script (\code{MiniProject\_ExN\_Jose\_Fernandes\_Pedro\_Venda.m}) e o respetivo simulador. Colocamos o código completo no Anexo~\ref{sec:anexo}.
 
 % ============================================================
 % 2. TASK 1
@@ -197,7 +199,9 @@ Cada exercício tem um script (\code{MiniProject\_ExN\_Jose\_Fernandes\_Pedro\_V
 
 \subsection{1.a -- Simulador \code{Sim2FlowsMP}}
 
-Partimos do simulador fornecido, \code{Sim2Flows} (FIFO com 2 fluxos), e fizemos uma nova versão para 3 fluxos. O algoritmo continua a ser FIFO, com uma única fila. Este simulador é também a base dos simuladores das Tasks 2 e 3. A Tabela~\ref{tab:alt1} resume as alterações.
+Partimos do simulador fornecido, \code{Sim2Flows} (FIFO com 2 fluxos), e fizemos uma nova versão para 3 fluxos. O algoritmo continuava a ser FIFO, com uma única fila.
+Usámos também este simulador como base das Tasks 2 e 3.
+A Tabela~\ref{tab:alt1} resume as alterações.
 
 \begin{table}[H]
 \centering
@@ -223,10 +227,11 @@ Partimos do simulador fornecido, \code{Sim2Flows} (FIFO com 2 fluxos), e fizemos
 
 \textbf{Justificação das principais alterações:}
 \begin{itemize}
-  \item \textbf{Parâmetro \code{flows} e \code{FLOW\_NUM} (1, 2, 4):} no original, os tamanhos estavam escritos dentro do simulador e só davam para 2 fluxos. Passando os tamanhos como argumento (\code{flows = \{100:1500; 100:150; 500:1000\}}), o simulador funciona para qualquer número de fluxos, e os contadores ficam com uma posição por fluxo.
-  \item \textbf{Primeira chegada (5):} o original só criava as chegadas dos fluxos 1 e 2; sem esta alteração, o Fluxo 3 nunca teria pacotes.
-  \item \textbf{Tamanho do pacote e gerador (7, 10):} o \code{if/else} só distinguia 2 fluxos e as distribuições eram as do exemplo das aulas. Como no enunciado todos os tamanhos têm igual probabilidade, basta \code{randi([min max])}.
-  \item \textbf{Otimizações (3, 6, 8, 9):} usar \code{min} em vez de ordenar a lista de eventos e pré-alocar a fila evita copiar matrizes em cada iteração. Cada simulação passou de cerca de 3,5 s para cerca de 1,3 s.
+  \item \textbf{Parâmetro \code{flows} e \code{FLOW\_NUM} (1, 2, 4):} no original, os tamanhos estavam escritos dentro do simulador e só davam para 2 fluxos. Passámos a usar os tamanhos como argumento (\code{flows = \{100:1500; 100:150; 500:1000\}}); assim, o simulador funciona para qualquer número de fluxos e os contadores ficam com uma posição por fluxo.
+  \item \textbf{Primeira chegada (5):} o original só criava as chegadas dos fluxos 1 e 2; alterámos para que o Fluxo 3 passasse também a ter pacotes.
+  \item \textbf{Tamanho do pacote e gerador (7, 10):} o \code{if/else} só distinguia 2 fluxos e as distribuições eram as do exemplo das aulas. Como no enunciado todos os tamanhos têm igual probabilidade, alterámos para \code{randi([min max])}.
+  \item \textbf{Otimizações (3, 6, 8, 9):} passámos a usar \code{min} em vez de ordenar a lista de eventos e a pré-alocar a fila, o que evita copiar matrizes em cada iteração.
+  Passámos de 3,5 s para cerca de 1,3 s por simulação.
 \end{itemize}
 
 Excerto com as alterações 5 e 6:
@@ -271,21 +276,20 @@ TT (Mbps) & 5,115 $\pm$ 0,007 & 0,800 $\pm$ 0,001 & 3,596 $\pm$ 0,005 \\
 \begin{itemize}
   \item \textbf{Não há perdas:} com $\rho = 0{,}952$, a fila de 1\,MB nunca chega a encher.
   \item \textbf{O \textit{throughput} de cada fluxo é igual ao débito que chega} ($\lambda_i \cdot 8 \cdot E[B_i]$ = 5,12, 0,80 e 3,60 Mbps), porque todos os pacotes são transmitidos.
-  \item \textbf{Os atrasos médios são quase iguais:} os três fluxos partilham a mesma fila FIFO, por isso têm o mesmo atraso médio na fila (cerca de 6,45 ms). A diferença entre eles é só o tempo de transmissão do próprio pacote. Por exemplo, $7{,}10 - 6{,}56 = 0{,}54$ ms $= 0{,}64 - 0{,}10$ ms.
-  \item \textbf{Os atrasos máximos são praticamente iguais (cerca de 42 ms):} o pior caso acontece nos picos de congestionamento, quando os pacotes de todos os fluxos estão presos na mesma fila.
-  \item Com FIFO, até o Fluxo 2, de pacotes pequenos, sofre quase o mesmo atraso que os outros: o atraso de cada fluxo depende do tráfego dos outros.
+  \item \textbf{Os atrasos médios são quase iguais:} os três fluxos partilham a mesma fila FIFO, por isso têm o mesmo atraso médio na fila (cerca de 6,45 ms).
+  \item \textbf{Os atrasos máximos são praticamente iguais (cerca de 42 ms)}.
 \end{itemize}
 
 \subsection{1.c -- Modelo M/G/1}
 
-As chegadas de cada fluxo são processos de Poisson, e a sua soma é um processo de Poisson com $\lambda = \sum_i \lambda_i = 2200$ pps. O tempo de transmissão tem uma distribuição geral, há um único servidor e a fila é muito grande. Por isso usámos o modelo M/G/1 (Módulo 2):
+As chegadas de cada fluxo são processos de Poisson, e a sua soma é um processo de Poisson com $\lambda = \sum_i \lambda_i = 2200$ pps. O tempo de transmissão tem uma distribuição geral, há um único servidor e a fila é muito grande. Por isso usámos o modelo M/G/1:
 \begin{align}
 E[S] &= \sum_i \frac{\lambda_i}{\lambda} E[S_i], \qquad E[S^2] = \sum_i \frac{\lambda_i}{\lambda} E[S_i^2], \qquad \rho = \lambda E[S] = 0{,}952 \\
 W_Q &= \frac{\lambda E[S^2]}{2(1-\rho)} = 6{,}704 \text{ ms} \qquad \text{(Pollaczek-Khintchine, igual para todos os fluxos)} \\
 W_i &= W_Q + E[S_i], \qquad TT_i = \lambda_i \cdot 8 \cdot E[B_i]
 \end{align}
 
-O simulador não tem atraso de propagação, por isso $W_i$ também não o inclui. Código da secção 1.c:
+Código da secção 1.c:
 \begin{lstlisting}
 for k = 1:3
     S = 8*flows{k}/(C*1e6);                  % tempo de transmissao de cada tamanho (s)
@@ -327,13 +331,8 @@ TT -- simulação (Mbps) & 5,115 $\pm$ 0,007 & 0,800 $\pm$ 0,001 & 3,596 $\pm$ 0
 
 \textbf{Conclusões:}
 \begin{itemize}
-  \item O \textit{throughput} teórico coincide com a simulação em todos os fluxos (diferenças inferiores a 0,1\%).
-  \item O atraso médio simulado fica cerca de 3,5\% abaixo do valor teórico, ligeiramente fora do intervalo de confiança. A tendência está certa: a diferença entre fluxos é exatamente a prevista. Atribuímos a diferença a duas causas:
-  \begin{enumerate}
-    \item \textbf{Grande variabilidade perto da saturação ($\rho \approx 0{,}95$):} o atraso de cada simulação depende de poucos períodos de congestionamento muito longos, e com 50 simulações o intervalo de confiança subestima a incerteza real. Prova disso é que o atraso médio do Fluxo 3 no caso C foi estimado duas vezes, de forma independente: deu $7{,}05 \pm 0{,}12$ ms na 1.b e $7{,}38 \pm 0{,}20$ ms na 1.d, e o valor teórico (7,30 ms) fica entre os dois.
-    \item \textbf{Efeito de \textit{warm-up} (Módulo 3):} cada simulação começa com o sistema vazio, e os primeiros pacotes têm atrasos abaixo do regime estacionário.
-  \end{enumerate}
-  \item Mais simulações, ou simulações mais longas, reduziriam estas diferenças. O M/G/1 é o modelo certo para este cenário; o M/M/1 não seria, porque o 2.º momento dos tamanhos uniformes é diferente do de uma exponencial.
+  \item O \textit{throughput} coincide com a teoria.
+  \item O atraso simulado fica cerca de 3,5\% abaixo do teórico. Com a ligação quase cheia ($\rho \approx 0{,}95$) o atraso varia muito entre simulações; na 1.d, o mesmo valor (Fluxo 3, caso C) deu 7,38 ms, acima da teoria (7,30 ms).
 \end{itemize}
 
 \subsection{1.d -- Fluxo 3 nos casos A, B e C}
@@ -360,11 +359,8 @@ C & 0,952 & 7,38 $\pm$ 0,20 ms   & 7,30 ms  & 43,7 $\pm$ 2,2 ms \\
 
 \textbf{Justificação e conclusões:}
 \begin{itemize}
-  \item O tráfego do Fluxo 3 é sempre o mesmo (600 pps); só aumenta o dos Fluxos 1 e 2. Mesmo assim, o atraso médio do Fluxo 3 fica 6 vezes maior do caso A para o C. Com FIFO \textbf{não há isolamento entre fluxos}.
-  \item O atraso não cresce linearmente com a carga. De A para B, $\rho$ aumenta 0,15 e o atraso aumenta 0,75 ms; de B para C, $\rho$ aumenta 0,15 e o atraso aumenta 5,4 ms. Isto vem do termo $1/(1-\rho)$ da fórmula de Pollaczek-Khintchine.
-  \item O atraso máximo cresce ainda mais (de 9 para 44 ms), porque com mais carga os períodos de congestionamento são mais longos.
-  \item Os intervalos de confiança alargam com a carga, porque perto da saturação o sistema varia muito mais.
-  \item Nos 3 casos, o valor teórico está dentro do intervalo de confiança.
+  \item O Fluxo 3 envia sempre o mesmo, mas o seu atraso fica 6 vezes maior de A para C, só porque os outros fluxos aumentam: com FIFO não há isolamento.
+  \item O atraso dispara perto de $\rho = 1$ (termo $1/(1-\rho)$). A teoria fica dentro do IC nos 3 casos.
 \end{itemize}
 
 % ============================================================
@@ -443,9 +439,9 @@ TT (Mbps) & 5,114 $\pm$ 0,007 & 0,800 $\pm$ 0,001 & 3,596 $\pm$ 0,005 \\
 
 \textbf{Justificação entre fluxos:}
 \begin{itemize}
-  \item \textbf{O Fluxo 3 tem atrasos muito mais baixos} (1,1 ms em média e 4,5 ms no máximo). Os seus pacotes passam à frente dos dos Fluxos 1 e 2 e só esperam pelo pacote que estiver a ser transmitido e por outros do próprio Fluxo 3. Sozinho, o Fluxo 3 ocupa só $\rho_3 = 0{,}36$ da ligação.
-  \item \textbf{Os Fluxos 1 e 2 têm atrasos semelhantes entre si}, porque partilham a fila de prioridade baixa. A diferença (0,54 ms) é a diferença entre os seus tempos de transmissão.
-  \item \textbf{As perdas e o \textit{throughput} não mudam:} com $\rho < 1$ e filas grandes, tudo o que chega é transmitido. As prioridades mudam \textit{quando} cada pacote é transmitido, não \textit{quanto}.
+  \item O Fluxo 3 passa à frente dos outros, por isso tem atrasos muito baixos (1,1 ms em média).
+  \item Os Fluxos 1 e 2 partilham a fila de prioridade baixa e ficam com atrasos semelhantes (cerca de 10--11 ms).
+  \item Perdas e \textit{throughput} iguais aos da 1.b: as prioridades só mudam a ordem de transmissão.
 \end{itemize}
 
 \textbf{Comparação com a 1.b (FIFO):}
@@ -467,9 +463,7 @@ MPD PQ (ms)   & 67,0 & 66,9 & 4,48 \\
 \end{table}
 
 \begin{itemize}
-  \item Com FIFO, os três fluxos têm praticamente o mesmo atraso. Com PQ há diferenciação: o Fluxo 3 ganha cerca de 6 ms no atraso médio e 38 ms no máximo, e os Fluxos 1 e 2 perdem cerca de 3,6 ms no médio e 25 ms no máximo.
-  \item O PQ redistribui o atraso, mas não o reduz no total. A média dos atrasos na fila pesada pela carga de cada fluxo é praticamente a mesma: $(0{,}36 \times 0{,}50 + 0{,}592 \times 10{,}10)/0{,}952 \approx 6{,}47$ ms com PQ, contra cerca de 6,46 ms com FIFO.
-  \item Ainda não há \textit{starvation} dos Fluxos 1 e 2, porque o Fluxo 3 só ocupa 36\% da ligação.
+  \item O Fluxo 3 ganha cerca de 6 ms no atraso médio; os Fluxos 1 e 2 perdem cerca de 3,6 ms. O PQ não reduz o atraso total, só o redistribui entre fluxos.
 \end{itemize}
 
 \subsection{2.c -- Modelo M/G/1 com prioridades}
@@ -516,10 +510,8 @@ Diferença relativa    & $-3{,}3\%$ & $-3{,}5\%$ & $-0{,}2\%$ \\
 
 \textbf{Conclusões:}
 \begin{itemize}
-  \item \textbf{Fluxo 3:} a teoria e a simulação coincidem (diferença de 0,2\%). Este fluxo vê uma carga baixa ($\rho_1 = 0{,}36$), por isso o seu atraso é estável.
-  \item \textbf{Fluxos 1 e 2:} a simulação fica cerca de 3,4\% abaixo da teoria. É o mesmo efeito da 1.c: estes fluxos absorvem toda a variabilidade de uma ligação com $\rho = 0{,}952$.
-  \item O Fluxo 3 continua a ter cerca de 0,5 ms de atraso na fila porque o PQ é \textbf{não preemptivo}: se chegar a meio da transmissão de um pacote do Fluxo 1 (até 1,2 ms), tem de esperar que termine. É isso que representa o numerador $\sum_i \lambda_i E[S_i^2]$.
-  \item O denominador $(1-\rho_1)(1-\rho_1-\rho_2) = 0{,}64 \times 0{,}048$ explica porque é que o atraso dos Fluxos 1 e 2 dispara.
+  \item Fluxo 3: teoria e simulação coincidem.
+  \item Fluxos 1 e 2: a simulação fica cerca de 3,4\% abaixo, pela mesma razão da 1.c (ligação quase cheia).
 \end{itemize}
 
 \subsection{2.d -- Fluxo 3 nos casos A, B e C}
@@ -546,12 +538,9 @@ C & 0,952 & 7,38 ms  & 1,102 ms & 1,103 ms & 43,7 ms & 4,40 ms \\
 
 \textbf{Justificação, comparação com a 1.d e conclusões:}
 \begin{itemize}
-  \item \textbf{Com PQ, o Fluxo 3 quase não depende do tráfego dos outros fluxos:} entre os casos A e C, o atraso médio só sobe de 0,94 para 1,10 ms (+17\%) e o máximo fica constante (cerca de 4,4--4,5 ms). Com FIFO, o atraso médio sobe 6 vezes e o máximo quase 5 vezes.
-  \item O atraso médio ainda sobe um pouco porque o numerador $\sum_i \lambda_i E[S_i^2]$ cresce com o tráfego dos Fluxos 1 e 2: é mais provável que um pacote do Fluxo 3 chegue a meio da transmissão de um pacote grande.
-  \item O atraso máximo fica constante porque, no pior caso, o pacote do Fluxo 3 espera um pacote de prioridade baixa (até 1,2 ms) e os do próprio Fluxo 3, e nenhuma destas parcelas depende da carga dos outros fluxos.
-  \item \textbf{A vantagem do PQ aumenta com a carga:} no caso A o atraso médio melhora 24\%; no caso C fica cerca de 6,7 vezes menor e o máximo cerca de 10 vezes menor.
-  \item Os resultados coincidem com o M/G/1 com prioridades nos 3 casos (diferenças até 0,1\%).
-  \item A contrapartida é que esta proteção é paga pelos Fluxos 1 e 2 (ver 2.b). Se o Fluxo 3 tivesse muito mais tráfego, os fluxos de prioridade baixa podiam sofrer \textit{starvation}.
+  \item Com PQ, o atraso do Fluxo 3 quase não muda de A para C (0,94 $\rightarrow$ 1,10 ms) e o máximo fica em cerca de 4,5 ms. Com FIFO, crescia 6 vezes.
+  \item A vantagem do PQ é maior quanto mais carregada está a ligação: no caso C, o atraso é cerca de 6,7 vezes menor.
+  \item A simulação coincide com a teoria nos 3 casos.
 \end{itemize}
 
 % ============================================================
@@ -643,13 +632,8 @@ TT (Mbps) & 5,115 $\pm$ 0,008 & 0,800 $\pm$ 0,001 & 3,602 $\pm$ 0,006 \\
 
 \textbf{Justificação entre fluxos:}
 \begin{itemize}
-  \item Não há perdas e o \textit{throughput} é igual ao débito pedido ($\rho < 1$).
-  \item Com quanta iguais, em congestionamento cada fluxo ativo tem direito a cerca de $10/3 = 3{,}33$ Mbps. O atraso de cada fluxo depende de quanto o seu débito se afasta dessa parte:
-  \begin{itemize}
-    \item \textbf{Fluxo 2} (0,8 Mbps, muito abaixo): a fila esvazia em cada ronda, por isso tem o menor atraso (2,0 ms).
-    \item \textbf{Fluxo 3} (3,6 Mbps, ligeiramente acima): acumula alguns pacotes nos picos (4,3 ms).
-    \item \textbf{Fluxo 1} (5,12 Mbps, bem acima): fica limitado à sua parte nos períodos de congestionamento e absorve a maior parte do atraso (10 ms, máximo 74 ms).
-  \end{itemize}
+  \item Sem perdas e com \textit{throughput} igual ao pedido ($\rho < 1$).
+  \item Com quanta iguais, cada fluxo tem direito a cerca de 3,33 Mbps. Quem envia menos espera menos: Fluxo 2 (0,8 Mbps) 2,0 ms, Fluxo 3 (3,6 Mbps) 4,3 ms, Fluxo 1 (5,12 Mbps) 10 ms.
 \end{itemize}
 
 \textbf{Comparação com a 1.b (FIFO) e a 2.b (PQ):}
@@ -671,9 +655,8 @@ DRR (3.b)  & 10,05 & 2,02 & 4,32 & 73,8 & 5,26 & 25,4 \\
 \end{table}
 
 \begin{itemize}
-  \item \textbf{FIFO} não diferencia os fluxos. \textbf{PQ} diferencia por prioridade fixa: o Fluxo 3 é o mais rápido, mas os Fluxos 1 e 2 são castigados por igual (o Fluxo 2 passa de 6,6 para 10,2 ms).
-  \item \textbf{DRR} diferencia por justiça: protege quem envia pouco (Fluxo 2: de 6,6 para 2,0 ms) e penaliza quem usa mais do que a sua parte (Fluxo 1). O Fluxo 3 fica entre FIFO e PQ.
-  \item As perdas e o \textit{throughput} são iguais nos três algoritmos, porque com $\rho < 1$ nenhum perde pacotes. Mudar de algoritmo só muda \textbf{quem} espera.
+  \item FIFO trata todos por igual; PQ favorece o Fluxo 3; DRR protege quem envia pouco (Fluxo 2: 6,6 $\rightarrow$ 2,0 ms) e penaliza quem envia mais (Fluxo 1).
+  \item Perdas e \textit{throughput} iguais nos três: só muda quem espera.
 \end{itemize}
 
 \subsection{3.c -- Caso D (congestionado) com Quantum = 1500 / 1500 / 1500}
@@ -701,13 +684,11 @@ TT (Mbps) & 4,500 $\pm$ 0,001 & 0,999 $\pm$ 0,001 & 4,500 $\pm$ 0,001 \\
 
 \textbf{Justificação entre fluxos:}
 \begin{itemize}
-  \item O débito pedido (13,4 Mbps) é maior do que a capacidade (10 Mbps), por isso a ligação está sempre ocupada.
-  \item \textbf{\textit{Throughput}:} o Fluxo 2 pede só 1,0 Mbps (menos do que 3,33), por isso recebe tudo. Os 9 Mbps que sobram são divididos igualmente pelos Fluxos 1 e 3: 4,5 Mbps cada.
-  \item \textbf{Perdas:} o Fluxo 2 não perde pacotes. Os Fluxos 1 e 3 perdem cerca de 21\%, que é o excesso descartado à entrada porque as suas filas estão cheias. O DRR \textbf{isola} os fluxos: as filas cheias dos Fluxos 1 e 3 não afetam o Fluxo 2. A perda em bytes seria cerca de 30\% e 25\%; a perda em pacotes é menor porque, com a fila quase cheia, os pacotes pequenos ainda cabem, e porque no início de cada simulação as filas ainda estão a encher.
-  \item \textbf{Atrasos:} os Fluxos 1 e 3 têm a fila sempre quase cheia (1\,MB) e esvaziam-na a 4,5 Mbps, o que demora $10^6 \cdot 8 / 4{,}5\cdot10^6 \approx 1{,}78$ s. Isso coincide com o atraso máximo medido (cerca de 1,79 s). O Fluxo 2 continua com 2,8 ms.
+  \item A ligação não chega para tudo (13,4 Mbps pedidos para 10 Mbps). O Fluxo 2 pede só 1 Mbps e recebe tudo; os outros dois dividem o resto, 4,5 Mbps cada.
+  \item Os Fluxos 1 e 3 enchem as suas filas: perdem cerca de 21\% dos pacotes e esperam cerca de 1,6 s. O Fluxo 2 não perde nada (2,8 ms): o DRR isola os fluxos.
 \end{itemize}
 
-\textbf{Comparação com a 3.b:} no caso C, o DRR só mudava os atrasos. No caso D, decide quanto \textit{throughput} recebe cada fluxo, seguindo o \textit{max-min fairness}. O Fluxo 2 quase não é afetado (de 2,0 para 2,8 ms), enquanto os atrasos dos Fluxos 1 e 3 passam de milissegundos para mais de um segundo. Com FIFO, no caso D, todos os fluxos teriam perdas e atrasos de segundos.
+\textbf{Comparação com a 3.b:} no caso C o DRR só mudava os atrasos; no caso D passa a decidir quanto cada fluxo transmite.
 
 \subsection{3.d -- Caso D com Quantum = 1500 / 1500 / 4500}
 
@@ -734,9 +715,8 @@ TT (Mbps) & 3,003 $\pm$ 0,006 & 1,000 $\pm$ 0,001 & 5,997 $\pm$ 0,006 \\
 
 \textbf{Justificação entre fluxos:}
 \begin{itemize}
-  \item \textbf{Fluxo 3:} com peso 3/5, tem direito a 6 Mbps e pede exatamente 6,0 Mbps, por isso recebe tudo: não tem perdas e o atraso é de 7,7 ms.
-  \item \textbf{Fluxo 2:} continua a receber o que pede (1,0 Mbps), sem perdas (3,7 ms).
-  \item \textbf{Fluxo 1:} é o único que pede mais do que tem direito e fica com o que sobra, $10 - 1 - 6 = 3$ Mbps. Perde 42\% dos pacotes e tem a fila sempre cheia, com um atraso de cerca de 2,5 s (esvaziar 1\,MB a 3 Mbps demora cerca de 2,67 s). O máximo (2,93 s) é um pouco maior porque, quando o Fluxo 3 acumula pacotes, usa mais do que 6 Mbps e o Fluxo 1 recebe menos de 3 Mbps.
+  \item Com o triplo do peso, o Fluxo 3 tem direito a 6 Mbps, exatamente o que pede: sem perdas e com 7,7 ms de atraso.
+  \item O Fluxo 2 continua a receber tudo. O Fluxo 1 fica com o que sobra (3 Mbps), perde 42\% dos pacotes e espera cerca de 2,5 s.
 \end{itemize}
 
 \textbf{Comparação com a 3.c:}
@@ -756,9 +736,7 @@ APD 3.c / 3.d (ms)   & 1649 / 2514 & 2,8 / 3,7 & 1621 / 7,7 \\
 \end{table}
 
 \begin{itemize}
-  \item Triplicar o quantum do Fluxo 3 transfere 1,5 Mbps do Fluxo 1 para o Fluxo 3. O Fluxo 3 deixa de perder pacotes e o seu atraso cai de 1,6 s para 7,7 ms; o Fluxo 1 duplica as perdas.
-  \item O Fluxo 2 quase não é afetado, mas o seu atraso sobe ligeiramente (de 2,8 para 3,7 ms, e o máximo de 5,5 para 9,3 ms): em cada ronda o Fluxo 3 transmite até 4500 B, o que torna a ronda mais longa e aumenta o \textit{jitter}.
-  \item Com o DRR, o administrador controla a repartição da capacidade em congestionamento através dos quanta, sem precisar de conhecer o tamanho médio dos pacotes.
+  \item Triplicar o quantum do Fluxo 3 passa 1,5 Mbps do Fluxo 1 para o Fluxo 3. Com os quanta controla-se quanto cada fluxo recebe em congestionamento.
 \end{itemize}
 
 \subsection{3.e -- \textit{Throughput} ideal (\textit{max-min fairness} ponderado)}
@@ -816,10 +794,7 @@ end
 
 \textbf{Conclusões:}
 \begin{itemize}
-  \item A simulação coincide com o \textit{throughput} ideal em todos os fluxos, nos dois casos (diferenças até 0,1\%). O DRR implementa o \textit{max-min fairness} ponderado, com os quanta como pesos, em períodos de congestionamento longos.
-  \item O caso D é um congestionamento permanente ($\rho = 1{,}34$), em que todas as filas estão sempre ativas. É a situação em que o DRR se aproxima mais do ideal.
-  \item O DRR consegue esta repartição sem conhecer o tamanho médio dos pacotes: os Fluxos 1 e 3 têm tamanhos médios diferentes (800 e 750 B) e recebem exatamente 4,5 Mbps cada na 3.c. Com o RR, a repartição seria proporcional ao tamanho médio dos pacotes; com o WRR, seria preciso conhecer esses tamanhos.
-  \item Os fluxos que pedem menos do que a sua parte nunca são penalizados, e o excesso de tráfego fica só em quem o provoca.
+  \item A simulação coincide com o \textit{throughput} ideal nos dois casos: o DRR cumpre o \textit{max-min fairness} ponderado, com os quanta como pesos.
 \end{itemize}
 
 % ============================================================
@@ -829,11 +804,10 @@ end
 \section{Conclusões gerais}
 
 \begin{itemize}
-  \item \textbf{FIFO} é o algoritmo mais simples, mas não isola os fluxos: o atraso de cada fluxo depende do tráfego dos outros, e todos esperam o mesmo na fila. O modelo M/G/1 descreve bem o seu comportamento.
-  \item \textbf{Priority Queuing} protege muito bem o fluxo prioritário (o atraso do Fluxo 3 fica praticamente constante, cerca de 1 ms, em todos os casos), mas à custa dos fluxos de prioridade baixa, que podem sofrer \textit{starvation} se o tráfego prioritário for elevado. O modelo M/G/1 com prioridades acerta no comportamento do sistema.
-  \item \textbf{Deficit Round Robin} reparte a ligação de forma justa: protege os fluxos que respeitam a sua parte e, em congestionamento, atribui a capacidade segundo o \textit{max-min fairness} ponderado, configurável através dos quanta. Os resultados coincidem com o \textit{throughput} ideal.
-  \item Com $\rho < 1$ e filas grandes, os três algoritmos têm as mesmas perdas e o mesmo \textit{throughput}: só mudam \textbf{quem espera} e \textbf{quanto}. Só em congestionamento ($\rho > 1$) é que o algoritmo decide também \textbf{quanto} cada fluxo transmite.
-  \item Perto da saturação ($\rho \approx 0{,}95$), os atrasos variam muito entre simulações, e 50 simulações de 100\,000 pacotes deixam diferenças de alguns por cento em relação à teoria.
+  \item \textbf{FIFO:} simples, mas o atraso de cada fluxo depende do tráfego dos outros.
+  \item \textbf{PQ:} protege o fluxo prioritário (cerca de 1 ms em todos os casos), à custa dos restantes.
+  \item \textbf{DRR:} reparte a ligação de forma justa e, em congestionamento, dá a cada fluxo a parte definida pelos quanta.
+  \item As simulações confirmam os modelos teóricos (M/G/1, M/G/1 com prioridades e \textit{max-min fairness}).
 \end{itemize}
 
 % ============================================================
