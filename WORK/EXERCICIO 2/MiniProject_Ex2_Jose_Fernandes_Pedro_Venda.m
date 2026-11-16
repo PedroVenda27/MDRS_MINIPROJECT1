@@ -126,7 +126,7 @@ for i = 1:3
     fprintf("Flow %d:\n Theoretical Avg. Packet Delay (ms) = %.3e\n", i, theory_packet_delay(i));
 end
 
-% comparação com a simulação da 2.b (se já corrida)
+% comparação com a simulação da 2.b (Tem de Já Estar Corrida)
 if exist('sim_packet_delay', 'var')
     figure;
     bar(1:3, sim_packet_delay);
@@ -144,7 +144,7 @@ end
 
 
 %% 2.d
-% alocação de resultados (N por caso)
+% alocação dos resultados (N por caso)
 packet_loss = zeros(3*N, 3);
 packet_delay = zeros(3*N, 3);
 max_packet_delay= zeros(3*N, 3);
