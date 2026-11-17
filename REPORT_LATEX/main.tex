@@ -105,7 +105,7 @@
   \vfill
   {\large\textbf{Grupo}\par}
   \vspace{0.3cm}
-  {\large José Fernandes -- \underline{\hspace{1.8cm}}\\
+  {\large José Fernandes -- 114472 \hspace{1.8cm}}\\
    Pedro Venda -- 139321\par}
 
   \vspace{0.6cm}
@@ -135,7 +135,7 @@
 % ============================================================
 \section{Introdução}
 
-Neste mini-projeto estudámos o desempenho de uma ligação de $C = 10$ Mbps que suporta 3 fluxos de pacotes. Usámos simulação de eventos discretos e modelos teóricos, e comparámos três algoritmos de escalonamento:
+Neste mini-projeto estudámos o desempenho de uma ligação de $C = 10$ Mbps que suporta 3 fluxos de pacotes. Usámos simulação de eventos discretos e modelos teóricos, e comparámos três algoritmos de escalonamento.
 
 \begin{itemize}
   \item \textbf{Task 1 -- FIFO:} uma única fila para todos os fluxos, validada com o modelo M/G/1;
@@ -143,65 +143,62 @@ Neste mini-projeto estudámos o desempenho de uma ligação de $C = 10$ Mbps que
   \item \textbf{Task 3 -- Deficit Round Robin (DRR):} uma fila por fluxo, validada com o princípio de \textit{max-min fairness} ponderado.
 \end{itemize}
 
-\subsection{Fluxos e casos de tráfego}
 
-Os tamanhos dos pacotes de cada fluxo têm todos a mesma probabilidade (Tabela~\ref{tab:fluxos}). O tempo de transmissão de um pacote de $B$ Bytes é $S = 8B/C$.
+% \subsection{Fluxos e casos de tráfego}
 
-\begin{table}[H]
-\centering
-\caption{Características dos fluxos.}
-\label{tab:fluxos}
-\begin{tabular}{cccc}
-\toprule
-Fluxo & Tamanhos (Bytes) & Tamanho médio $E[B]$ & $E[S] = 8E[B]/C$ \\
-\midrule
-1 & 100 -- 1500 & 800 B & 0,640 ms \\
-2 & 100 -- 150  & 125 B & 0,100 ms \\
-3 & 500 -- 1000 & 750 B & 0,600 ms \\
-\bottomrule
-\end{tabular}
-\end{table}
+% Os tamanhos dos pacotes de cada fluxo têm todos a mesma probabilidade (Tabela~\ref{tab:fluxos}). O tempo de transmissão de um pacote de $B$ Bytes é $S = 8B/C$.
 
-\begin{table}[H]
-\centering
-\caption{Casos de tráfego e carga da ligação $\rho = \sum_i \lambda_i E[S_i]$.}
-\label{tab:casos}
-\begin{tabular}{ccccc}
-\toprule
-Caso & $\lambda_1$ (pps) & $\lambda_2$ (pps) & $\lambda_3$ (pps) & $\rho$ \\
-\midrule
-A & 400  & 400  & 600  & 0,656 \\
-B & 600  & 600  & 600  & 0,804 \\
-C & 800  & 800  & 600  & 0,952 \\
-D & 1000 & 1000 & 1000 & 1,340 (congestionado) \\
-\bottomrule
-\end{tabular}
-\end{table}
+% \begin{table}[H]
+% \centering
+% \caption{Características dos fluxos.}
+% \label{tab:fluxos}
+% \begin{tabular}{cccc}
+% \toprule
+% Fluxo & Tamanhos (Bytes) & Tamanho médio $E[B]$ & $E[S] = 8E[B]/C$ \\
+% \midrule
+% 1 & 100 -- 1500 & 800 B & 0,640 ms \\
+% 2 & 100 -- 150  & 125 B & 0,100 ms \\
+% 3 & 500 -- 1000 & 750 B & 0,600 ms \\
+% \bottomrule
+% \end{tabular}
+% \end{table}
 
-\subsection{Metodologia}
+% \begin{table}[H]
+% \centering
+% \caption{Casos de tráfego e carga da ligação $\rho = \sum_i \lambda_i E[S_i]$.}
+% \label{tab:casos}
+% \begin{tabular}{ccccc}
+% \toprule
+% Caso & $\lambda_1$ (pps) & $\lambda_2$ (pps) & $\lambda_3$ (pps) & $\rho$ \\
+% \midrule
+% A & 400  & 400  & 600  & 0,656 \\
+% B & 600  & 600  & 600  & 0,804 \\
+% C & 800  & 800  & 600  & 0,952 \\
+% D & 1000 & 1000 & 1000 & 1,340 (congestionado) \\
+% \bottomrule
+% \end{tabular}
+% \end{table}
 
-Em todas as experiências corremos $N = 50$ simulações, cada uma com o critério de paragem $P = 100\,000$ pacotes transmitidos. Para cada parâmetro de desempenho apresentamos a média das 50 simulações e o intervalo de confiança a 90\%:
-\begin{equation}
-\bar{X}(N) \pm z_{1-\alpha/2}\sqrt{\frac{S^2(N)}{N}}, \qquad \alpha = 0{,}1, \quad z_{0{,}95} = 1{,}6449
-\end{equation}
+% \subsection{Metodologia}
 
-Os parâmetros estimados para cada fluxo são: a perda de pacotes PL (\%), o atraso médio APD (ms), o atraso máximo MPD (ms) e o \textit{throughput} transmitido TT (Mbps).
+% Em todas as experiências corremos $N = 50$ simulações, cada uma com o critério de paragem $P = 100\,000$ pacotes transmitidos. Para cada parâmetro de desempenho apresentamos a média das 50 simulações e o intervalo de confiança a 90\%:
+% \begin{equation}
+% \bar{X}(N) \pm z_{1-\alpha/2}\sqrt{\frac{S^2(N)}{N}}, \qquad \alpha = 0{,}1, \quad z_{0{,}95} = 1{,}6449
+% \end{equation}
 
-Nos gráficos, as barras são a média e as barras de erro são o intervalo de confiança.
+% Os parâmetros estimados para cada fluxo são: a perda de pacotes PL (\%), o atraso médio APD (ms), o atraso máximo MPD (ms) e o \textit{throughput} transmitido TT (Mbps).
 
-Cada exercício é composto por um script (\code{MiniProject\_ExN\_Jose\_Fernandes\_Pedro\_Venda.m}) e o respetivo simulador. Colocamos o código completo no Anexo~\ref{sec:anexo}.
+% Nos gráficos, as barras são a média e as barras de erro são o intervalo de confiança.
+
+% Cada exercício é composto por um script (\code{MiniProject\_ExN\_Jose\_Fernandes\_Pedro\_Venda.m}) e o respetivo simulador. Colocamos o código completo no Anexo~\ref{sec:anexo}.
 
 % ============================================================
 % 2. TASK 1
 % ============================================================
-\newpage
+% \newpage
 \section{Task 1 -- FIFO}
 
 \subsection{1.a -- Simulador \code{Sim2FlowsMP}}
-
-Partimos do simulador fornecido, \code{Sim2Flows} (FIFO com 2 fluxos), e fizemos uma nova versão para 3 fluxos. O algoritmo continuava a ser FIFO, com uma única fila.
-Usámos também este simulador como base das Tasks 2 e 3.
-A Tabela~\ref{tab:alt1} resume as alterações.
 
 \begin{table}[H]
 \centering
@@ -227,33 +224,72 @@ A Tabela~\ref{tab:alt1} resume as alterações.
 
 \textbf{Justificação das principais alterações:}
 \begin{itemize}
-  \item \textbf{Parâmetro \code{flows} e \code{FLOW\_NUM} (1, 2, 4):} no original, os tamanhos estavam escritos dentro do simulador e só davam para 2 fluxos. Passámos a usar os tamanhos como argumento (\code{flows = \{100:1500; 100:150; 500:1000\}}); assim, o simulador funciona para qualquer número de fluxos e os contadores ficam com uma posição por fluxo.
+  \item \textbf{Parâmetro \code{flows} e \code{FLOW\_NUM} (1, 2, 4):} no original, os tamanhos estavam escritos dentro do simulador e só davam para 2 fluxos. Passámos a usar os tamanhos como argumento (\code{flows = \{100:1500; 100:150; 500:1000\}}); assim, o simulador funciona para qualquer número de fluxos e os contadores ficam com uma posição por fluxo. Isto foi feito para caso fosse necessário alguma alteração futura e para melhor percebermos o conceito do programa, já que nos obriga a entender quais são as variáveis que necessitam de mudança e o porquê.
   \item \textbf{Primeira chegada (5):} o original só criava as chegadas dos fluxos 1 e 2; alterámos para que o Fluxo 3 passasse também a ter pacotes.
   \item \textbf{Tamanho do pacote e gerador (7, 10):} o \code{if/else} só distinguia 2 fluxos e as distribuições eram as do exemplo das aulas. Como no enunciado todos os tamanhos têm igual probabilidade, alterámos para \code{randi([min max])}.
   \item \textbf{Otimizações (3, 6, 8, 9):} passámos a usar \code{min} em vez de ordenar a lista de eventos e a pré-alocar a fila, o que evita copiar matrizes em cada iteração.
-  Passámos de 3,5 s para cerca de 1,3 s por simulação.
+  Passámos de 3,5s por simulação para cerca de 1,3s, o que nos permitiu passar mais tempo a desenvolver e menos a testar.
 \end{itemize}
 
-Excerto com as alterações 5 e 6:
-\begin{lstlisting}[firstnumber=49]
+\begin{lstlisting}
+FLOW_NUM = length(flows);
+...
+QUEUE = zeros(P,3);
+queue_count = 0;     % Tracks current number of packets in queue
+...
 EventList = zeros(FLOW_NUM, 5);
 for k = 1:FLOW_NUM
     tmp = Clock + exprnd(1/lambda(k));
     EventList(k,:) = [ARRIVAL, tmp, GenerateSize(flows{k}), k, tmp];
 end
 ...
-[~, idx] = min(EventList(:,2));
-Event      = EventList(idx, 1);
-Clock      = EventList(idx, 2);
+% more optimization processes the sortrows takes a looong time
+    [~, idx] = min(EventList(:,2));
+    Event      = EventList(idx, 1);
+    Clock      = EventList(idx, 2);
+    PacketSize = EventList(idx, 3);
+    Flow       = EventList(idx, 4);
+    ArrInstant = EventList(idx, 5);
+    EventList(idx, :) = [];
+    
+    switch Event
+        case ARRIVAL         % If event is an ARRIVAL
+            ...
+            if STATE==0
+               ...
+            else
+                if QUEUEOCCUPATION + PacketSize <= f
+                    queue_count = queue_count + 1;
+                    QUEUE(queue_count, :) = [PacketSize , Clock, Flow];
+                    QUEUEOCCUPATION= QUEUEOCCUPATION + PacketSize;
+                ...
+            end
+        case DEPARTURE          % If event is a DEPARTURE
+            ...
+            if QUEUEOCCUPATION > 0
+                QSize= QUEUE(1,1);
+                QInstant= QUEUE(1,2);
+                QFlow= QUEUE(1,3);
+                EventList = [EventList; DEPARTURE, Clock + 8*QSize/(C*1e6), QSize, QFlow, QInstant];
+                QUEUEOCCUPATION= QUEUEOCCUPATION - QSize;
+                if queue_count > 1
+                    QUEUE(1:queue_count-1, :) = QUEUE(2:queue_count, :);
+                end
+                queue_count = queue_count - 1;
+                ...
+
+function out= GenerateSize(flow)
+    out= randi([flow(1) flow(length(flow))]);
+end
 \end{lstlisting}
 
 \subsection{1.b -- Simulação do caso C}
 
-Simulámos o caso C com uma fila de $f = 1\,000\,000$ Bytes.
+Na alínea b obtivemos os seguintes resultados.
 
 \begin{figure}[H]
 \centering
-\includegraphics[width=0.9\textwidth]{figures/Task1b.png}
+\includegraphics[width=1\textwidth]{figures/Task1b.png}
 \caption{Task 1.b -- FIFO, caso C.}
 \end{figure}
 
@@ -272,43 +308,36 @@ TT (Mbps) & 5,115 $\pm$ 0,007 & 0,800 $\pm$ 0,001 & 3,596 $\pm$ 0,005 \\
 \end{tabular}
 \end{table}
 
-\textbf{Justificação:}
+\textbf{Justificações e Conclusões:}
 \begin{itemize}
-  \item \textbf{Não há perdas:} com $\rho = 0{,}952$, a fila de 1\,MB nunca chega a encher.
+  \item \textbf{Não há perdas:} Devido ao tamanho de 1\,MB, a fila nunca chega a encher e não existem perdas.
   \item \textbf{O \textit{throughput} de cada fluxo é igual ao débito que chega} ($\lambda_i \cdot 8 \cdot E[B_i]$ = 5,12, 0,80 e 3,60 Mbps), porque todos os pacotes são transmitidos.
-  \item \textbf{Os atrasos médios são quase iguais:} os três fluxos partilham a mesma fila FIFO, por isso têm o mesmo atraso médio na fila (cerca de 6,45 ms).
-  \item \textbf{Os atrasos máximos são praticamente iguais (cerca de 42 ms)}.
+  \item \textbf{Os atrasos máximos são praticamente iguais:} como o sistema implementado é FIFO e os três fluxos partilham a mesma fila, têm atrasos máximos iguais, pois este sistema não favorece nenhum dos fluxos.
+  \item \textbf{Average packet delay desigual:} Apesar da fila FIFO não priveligiar nenhum dos fluxos, o que faz com que o seu tempo médio em fila seja igual, como a variável considera também o tempo de transmissão, o fluxo com o menor average packet (Fluxo 2) é ligeiramente mais rápido.
 \end{itemize}
 
 \subsection{1.c -- Modelo M/G/1}
 
-As chegadas de cada fluxo são processos de Poisson, e a sua soma é um processo de Poisson com $\lambda = \sum_i \lambda_i = 2200$ pps. O tempo de transmissão tem uma distribuição geral, há um único servidor e a fila é muito grande. Por isso usámos o modelo M/G/1:
-\begin{align}
-E[S] &= \sum_i \frac{\lambda_i}{\lambda} E[S_i], \qquad E[S^2] = \sum_i \frac{\lambda_i}{\lambda} E[S_i^2], \qquad \rho = \lambda E[S] = 0{,}952 \\
-W_Q &= \frac{\lambda E[S^2]}{2(1-\rho)} = 6{,}704 \text{ ms} \qquad \text{(Pollaczek-Khintchine, igual para todos os fluxos)} \\
-W_i &= W_Q + E[S_i], \qquad TT_i = \lambda_i \cdot 8 \cdot E[B_i]
-\end{align}
-
-Código da secção 1.c:
+A fórmula teórica para cada fluxo foi calculada da seguinte maneira (esta demonstração foi simplicada e não contém os cálculos de todos os fluxos):
 \begin{lstlisting}
-for k = 1:3
-    S = 8*flows{k}/(C*1e6);                  % tempo de transmissao de cada tamanho (s)
-    ES(k) = sum(S.*p_flows{k});              % E[S]
-    ES2(k) = sum(S.^2.*p_flows{k});          % E[S^2]
-    avg_size(k) = sum(flows{k}.*p_flows{k}); % tamanho medio (Bytes)
-end
-lambda_C = sum(v_lambda_C);
-ES_agr = sum(v_lambda_C/lambda_C.*ES);
-ES2_agr = sum(v_lambda_C/lambda_C.*ES2);
-rho = lambda_C*ES_agr;
-WQ = lambda_C*ES2_agr/(2*(1-rho));
-theory_packet_delay = (WQ + ES)*1000;                % ms
-theory_throughput = v_lambda_C*8.*avg_size/1e6;      % Mbps
+Es_f1  = sum(p_flow1.*(8*flow1/C_bps));
+Es2_f1 = sum(p_flow1.*(8*flow1/C_bps).^2);
+
+rho1 = lambda1(3) * Es_f1;
+rho_total = rho1 + rho2 + rho3;
+
+Wq = (lambda1(3)*Es2_f1 + lambda2(3)*Es2_f2 + lambda3(3)*Es2_f3)/(2 * (1 - rho_total));
+%a posição 3 do lambda indica a ordem dos casos 3->C
+W1 = Wq + Es_f1;
+
+avg_B_f1 = sum(flow1)/numel(flow1);
+throughput_f1 = lambda1(3)*(8*avg_B_f1);
 \end{lstlisting}
 
+E foram obtidos os seguintes resultados:
 \begin{figure}[H]
 \centering
-\includegraphics[width=0.85\textwidth]{figures/Task1c.png}
+\includegraphics[width=1\textwidth]{figures/Task1c.png}
 \caption{Task 1.c -- Simulação vs M/G/1 (caso C).}
 \end{figure}
 
@@ -331,15 +360,14 @@ TT -- simulação (Mbps) & 5,115 $\pm$ 0,007 & 0,800 $\pm$ 0,001 & 3,596 $\pm$ 0
 
 \textbf{Conclusões:}
 \begin{itemize}
-  \item O \textit{throughput} coincide com a teoria.
-  \item O atraso simulado fica cerca de 3,5\% abaixo do teórico. Com a ligação quase cheia ($\rho \approx 0{,}95$) o atraso varia muito entre simulações; na 1.d, o mesmo valor (Fluxo 3, caso C) deu 7,38 ms, acima da teoria (7,30 ms).
+  \item O atraso simulado fica cerca de 3,5\% abaixo do teórico. Com a ligação quase cheia ($\rho \approx 0{,}95$) o atraso varia muito entre simulações.
 \end{itemize}
 
 \subsection{1.d -- Fluxo 3 nos casos A, B e C}
 
 \begin{figure}[H]
 \centering
-\includegraphics[width=0.85\textwidth]{figures/Task1d.png}
+\includegraphics[width=1\textwidth]{figures/Task1d.png}
 \caption{Task 1.d -- atraso médio e máximo do Fluxo 3 com FIFO.}
 \end{figure}
 
@@ -357,21 +385,25 @@ C & 0,952 & 7,38 $\pm$ 0,20 ms   & 7,30 ms  & 43,7 $\pm$ 2,2 ms \\
 \end{tabular}
 \end{table}
 
-\textbf{Justificação e conclusões:}
+\vspace{1em}
+\vspace{1em}
+\vspace{2em} 
+\noindent\textbf{Justificações e conclusões:}
 \begin{itemize}
-  \item O Fluxo 3 envia sempre o mesmo, mas o seu atraso fica 6 vezes maior de A para C, só porque os outros fluxos aumentam: com FIFO não há isolamento.
-  \item O atraso dispara perto de $\rho = 1$ (termo $1/(1-\rho)$). A teoria fica dentro do IC nos 3 casos.
+  \item Apesar da taxa de chegada do fluxo 3 ser constante, o seu atraso fica 6 vezes maior de A para C. Isto acontece, porque a taxa de utilização do link dos outros fluxos aumenta. 
+  \item O atraso dispara perto de $\rho = 1$.
 \end{itemize}
-
 % ============================================================
 % 3. TASK 2
 % ============================================================
-\newpage
+% \newpage
 \section{Task 2 -- Priority Queuing}
 
 \subsection{2.a -- Simulador \code{Sim2FlowsPrioMP}}
 
-O enunciado pede uma nova versão do \code{Sim2FlowsPrio}. Partimos do nosso \code{Sim2FlowsMP} (Task 1), que já suporta 3 fluxos e as otimizações descritas na secção anterior, e acrescentámos o que é preciso para ter prioridades: o Fluxo 3 tem a prioridade mais alta e os Fluxos 1 e 2 a segunda.
+% O enunciado pede uma nova versão do \code{Sim2FlowsPrio}. 
+
+Partimos do nosso \code{Sim2FlowsMP} (Task 1), que já suporta 3 fluxos e as otimizações descritas na secção anterior, e acrescentámos o que é preciso para ter prioridades: o Fluxo 3 tem a prioridade mais alta e os Fluxos 1 e 2 a segunda.
 
 \begin{table}[H]
 \centering
@@ -389,13 +421,17 @@ O enunciado pede uma nova versão do \code{Sim2FlowsPrio}. Partimos do nosso \co
 \end{tabularx}
 \end{table}
 
-\textbf{Justificação:}
+\textbf{Justificação das principais alterações:}
 \begin{itemize}
-  \item \textbf{\code{prio} e \code{f} (1, 2):} no script usamos \code{prio = [2 2 1]} (Fluxo 3 na fila 1) e \code{f = [1e6 1e6]}. As prioridades e os tamanhos das filas mudam sem mexer no simulador.
-  \item \textbf{Uma fila por prioridade (3):} o PQ usa uma fila por prioridade (Módulo 4). \code{QUEUE\{1\}} é a fila do Fluxo 3 e \code{QUEUE\{2\}} a dos Fluxos 1 e 2, cada uma com a sua ocupação e o seu contador.
-  \item \textbf{Chegada (4):} o pacote só ocupa espaço na fila da sua prioridade e só se perde se essa fila estiver cheia.
-  \item \textbf{Partida (5):} é a alteração que implementa o PQ. Um pacote dos Fluxos 1 ou 2 só é transmitido quando não há pacotes do Fluxo 3 à espera; dentro de cada fila a ordem é FIFO. O algoritmo é não preemptivo e \textit{work conserving}.
+  \item \textbf{Parâmetros \code{prio} e \code{f} (1, 2):} no \code{Sim2FlowsMP} havia uma só fila, com um único tamanho \code{f}, e nenhum fluxo tinha prioridade. Passámos a usar o vetor \code{prio} como argumento no caso (\code{prio = [2 2 1]}, com o Fluxo 3 na fila 1) e o \code{f} passou a vetor, com um tamanho por fila assim as prioridades e os tamanhos das filas mudam sem mexer no simulador.
+  \item \textbf{Uma fila por prioridade (3):} no \code{Sim2FlowsMP} todos os pacotes iam para a mesma fila. Como o PQ precisava de uma fila por prioridade, alterámos para um \textit{cell array}: \code{QUEUE\{1\}} é a fila do Fluxo 3 e \code{QUEUE\{2\}} as dos Fluxos 1 e 2, cada uma com a sua ocupação e o seu contador.
+  \item \textbf{Chegada (4):} antes, o pacote entrava na fila única e perdia-se se essa fila estivesse cheia. Alterámos para que o pacote só ocupe espaço na fila da sua prioridade e só se perca se essa fila estiver cheia.
+  \item \textbf{Partida (5):} antes, saía sempre o primeiro pacote da fila única. Passámos a escolher o pacote da fila de prioridade mais alta que não estivesse vazia: um pacote dos Fluxos 1 ou 2 só é transmitido quando não houver pacotes do Fluxo 3 à espera, e dentro de cada fila a ordem continua a ser FIFO.
 \end{itemize}
+% \pagebreak
+
+
+Código da secção 2.a:
 
 \begin{lstlisting}[firstnumber=72]
                 % fila da prioridade do pacote
@@ -418,8 +454,8 @@ O enunciado pede uma nova versão do \code{Sim2FlowsPrio}. Partimos do nosso \co
 
 \begin{figure}[H]
 \centering
-\includegraphics[width=0.9\textwidth]{figures/Task2b.png}
-\caption{Task 2.b -- Priority Queuing, caso C.}
+\includegraphics[width=1\textwidth]{figures/Task2b.png}
+\caption{Task 2.b -- Priority Queuing caso C.}
 \end{figure}
 
 \begin{table}[H]
@@ -437,9 +473,11 @@ TT (Mbps) & 5,114 $\pm$ 0,007 & 0,800 $\pm$ 0,001 & 3,596 $\pm$ 0,005 \\
 \end{tabular}
 \end{table}
 
+\vspace{4em}
+
 \textbf{Justificação entre fluxos:}
 \begin{itemize}
-  \item O Fluxo 3 passa à frente dos outros, por isso tem atrasos muito baixos (1,1 ms em média).
+  \item O Fluxo 3 passa à frente dos outros devido a sua prioridade, por isso tem atrasos muito baixos (1,1 ms em média).
   \item Os Fluxos 1 e 2 partilham a fila de prioridade baixa e ficam com atrasos semelhantes (cerca de 10--11 ms).
   \item Perdas e \textit{throughput} iguais aos da 1.b: as prioridades só mudam a ordem de transmissão.
 \end{itemize}
@@ -463,17 +501,21 @@ MPD PQ (ms)   & 67,0 & 66,9 & 4,48 \\
 \end{table}
 
 \begin{itemize}
-  \item O Fluxo 3 ganha cerca de 6 ms no atraso médio; os Fluxos 1 e 2 perdem cerca de 3,6 ms. O PQ não reduz o atraso total, só o redistribui entre fluxos.
+  \item O Fluxo 3 ganha cerca de 6 ms no atraso médio; 
+  \item os Fluxos 1 e 2 perdem cerca de 3,6 ms. Uma vez que O PQ não reduz o atraso total, só o redistribui entre fluxos.
 \end{itemize}
 
 \subsection{2.c -- Modelo M/G/1 com prioridades}
 
-Para filas muito grandes e chegadas de Poisson, o atraso médio na fila da prioridade $k$ é (Módulo 4):
-\begin{equation}
-W_{Q,1} = \frac{\sum_i \lambda_i E[S_i^2]}{2(1-\rho_1)}, \qquad
-W_{Q,k} = \frac{\sum_i \lambda_i E[S_i^2]}{2\left(1-\sum_{j<k}\rho_j\right)\left(1-\sum_{j\le k}\rho_j\right)}
-\end{equation}
-com $\rho_1 = \lambda_3 E[S_3] = 0{,}36$ (Fluxo 3) e $\rho_2 = \lambda_1 E[S_1] + \lambda_2 E[S_2] = 0{,}592$ (Fluxos 1 e 2). O numerador soma \textbf{todos} os fluxos, e o atraso de cada fluxo é $W_i = W_{Q,k} + E[S_i]$. Código da secção 2.c:
+Primeiro calculámos o tempo médio de transmissão de cada fluxo e a parte da ligação que cada um ocupa: o Fluxo 3, com prioridade alta, ocupa 36\% da ligação, e os Fluxos 1 e 2, com prioridade baixa, ocupam 59,2\%. Depois calculámos o tempo de espera na fila de cada prioridade:
+\begin{itemize}
+  \item \textbf{Prioridade alta (Fluxo 3):} só espera que acabe o pacote que está a ser transmitido e pelos outros pacotes do Fluxo 3, por isso o tempo na fila depende só da carga do próprio Fluxo 3.
+  \item \textbf{Prioridade baixa (Fluxos 1 e 2):} espera também por todos os pacotes do Fluxo 3, por isso o tempo na fila depende da carga total da ligação e fica muito maior.
+\end{itemize}
+Por fim, o atraso de cada fluxo é o tempo na fila da sua prioridade mais o tempo de transmissão do próprio pacote.
+
+\vspace{1em}
+Código da secção 2.c:
 
 \begin{lstlisting}
 rho = v_lambda_C.*ES;                        % ocupação de cada fluxo
@@ -490,7 +532,7 @@ theory_packet_delay = (WQ + ES)*1000;        % fila + transmissão (ms)
 
 \begin{figure}[H]
 \centering
-\includegraphics[width=0.75\textwidth]{figures/Task2c.png}
+\includegraphics[width=1\textwidth]{figures/Task2c.png}
 \caption{Task 2.c -- Simulação vs M/G/1 com prioridades (caso C).}
 \end{figure}
 
@@ -502,24 +544,24 @@ theory_packet_delay = (WQ + ES)*1000;        % fila + transmissão (ms)
 APD (ms) & Fluxo 1 & Fluxo 2 & Fluxo 3 \\
 \midrule
 M/G/1 com prioridades & 11,115 & 10,575 & 1,103 \\
-Simulação (2.b)       & 10,745 $\pm$ 0,252 & 10,205 $\pm$ 0,247 & 1,101 $\pm$ 0,002 \\
-Diferença relativa    & $-3{,}3\%$ & $-3{,}5\%$ & $-0{,}2\%$ \\
+Simulação (2.b)       & 11,075 $\pm$ 0,285 & 10,535 $\pm$ 0,275 & 1,102 $\pm$ 0,002 \\
+Diferença relativa    & $-0{,}4\%$ & $-0{,}4\%$ & $-0{,}1\%$ \\
 \bottomrule
 \end{tabular}
 \end{table}
 
 \textbf{Conclusões:}
 \begin{itemize}
-  \item Fluxo 3: teoria e simulação coincidem.
-  \item Fluxos 1 e 2: a simulação fica cerca de 3,4\% abaixo, pela mesma razão da 1.c (ligação quase cheia).
+  \item Tal como esperado, todos os valores teóricos coincidem dentro da faixa de erro das simulações.
+  \item Nos fluxos 1 e 2 a simulação fica cerca de 0.4\% abaixo, uma vez que "absorvem" um maior impacto da saturação do link, por terem menor prioridade.
 \end{itemize}
 
 \subsection{2.d -- Fluxo 3 nos casos A, B e C}
 
 \begin{figure}[H]
 \centering
-\includegraphics[width=0.85\textwidth]{figures/Task2d.png}
-\caption{Task 2.d -- Fluxo 3 com FIFO (1.d) e com prioridades (2.d).}
+\includegraphics[width=1\textwidth]{figures/Task2d.png}
+\caption{Task 2.d -- Fluxo 3 com prioridades}
 \end{figure}
 
 \begin{table}[H]
@@ -536,11 +578,12 @@ C & 0,952 & 7,38 ms  & 1,102 ms & 1,103 ms & 43,7 ms & 4,40 ms \\
 \end{tabular}
 \end{table}
 
-\textbf{Justificação, comparação com a 1.d e conclusões:}
+\textbf{Justificações, comparação com a 1.d e conclusões:}
 \begin{itemize}
-  \item Com PQ, o atraso do Fluxo 3 quase não muda de A para C (0,94 $\rightarrow$ 1,10 ms) e o máximo fica em cerca de 4,5 ms. Com FIFO, crescia 6 vezes.
-  \item A vantagem do PQ é maior quanto mais carregada está a ligação: no caso C, o atraso é cerca de 6,7 vezes menor.
-  \item A simulação coincide com a teoria nos 3 casos.
+    \item Existe um pequeno aumento do \textit{avg. packet delay} do caso A para o C, porque como o tráfego dos flows 1 e 2 aumenta, cresce a probabilidade de estar ocupado com um pacote de baixa prioridade;
+    \item Com PQ, o atraso do Fluxo 3 quase não muda de A para C (0,94 $\rightarrow$ 1,10 ms) e o máximo fica nos 4,5 ms. 
+  Com FIFO, este quase que crescia 6 vezes. Isto acontece, pois a prioridade faz com que o fluxo deixe de ser afetado pelo congestionamento do link;
+    \item Apesar do gráfico não o demonstrar, é importante ter em consideração que para o bom funcionamento do fluxo 3 com a PQ, os restantes fluxos de menor prioridade são altamente prejudicados. O mesmo não acontece com o FIFO.
 \end{itemize}
 
 % ============================================================
@@ -551,7 +594,7 @@ C & 0,952 & 7,38 ms  & 1,102 ms & 1,103 ms & 43,7 ms & 4,40 ms \\
 
 \subsection{3.a -- Simulador \code{Sim2FlowsDRRMP}}
 
-O enunciado pede uma nova versão do \code{Sim2FlowsDRR}. Partimos também do nosso \code{Sim2FlowsMP} e acrescentámos o DRR: uma fila por fluxo e, em cada ronda, os fluxos são servidos pela ordem do ID (1, 2, 3).
+Partimos também do nosso primeiro Simulador \code{Sim2FlowsMP} e acrescentámos o DRR: uma fila por fluxo e, em cada ronda, uma vez que os fluxos são servidos pela ordem do ID (1, 2, 3).
 
 \begin{table}[H]
 \centering
@@ -570,14 +613,17 @@ O enunciado pede uma nova versão do \code{Sim2FlowsDRR}. Partimos também do no
 \end{tabularx}
 \end{table}
 
-\textbf{Justificação:}
+\textbf{Justificação das principais alterações:}
 \begin{itemize}
-  \item \textbf{\code{Quantum} e \code{f} (1):} o quantum de cada fluxo é o número de bytes que pode enviar por ronda. Como argumento, permite as experiências do enunciado (\code{[1500 1500 1500]} e \code{[1500 1500 4500]}) sem mexer no simulador.
-  \item \textbf{Filas e variáveis do DRR (2, 3):} os algoritmos round robin usam uma fila por fluxo e uma fila final, onde ficam os pacotes escolhidos em cada ronda (Módulo 4). O crédito (\textit{deficit counter}) guarda os bytes que cada fluxo ainda pode enviar.
-  \item \textbf{Chegada (4):} cada fluxo só ocupa a sua própria fila. Em congestionamento, quem envia demasiado enche a sua fila sem roubar espaço aos outros.
-  \item \textbf{Ronda DRR (5):} é a alteração que implementa o DRR. Para cada fluxo com pacotes, somamos o quantum ao crédito e passamos para a fila final os primeiros pacotes cujo tamanho total não excede o crédito. O crédito que sobra fica para a ronda seguinte, e uma fila vazia fica com crédito zero. Como os quanta são $\geq 1500$ B, basta uma ronda para haver pelo menos um pacote na fila final. Opção nossa: o espaço na fila do fluxo é libertado quando o pacote passa para a fila final.
-  \item \textbf{Transmissão (6):} os pacotes são transmitidos a partir da fila final, pela ordem da ronda. O algoritmo continua \textit{work conserving}.
+  \item \textbf{Parâmetros \code{Quantum} e \code{f} (1):} Desta vez no \code{Sim2FlowsMP} não havia quantum e a fila única tinha de ter só tamanho \code{f}.Decidimos então passar a usar o vetor \code{Quantum} como argumento, com o número de bytes em que cada fluxo pode enviar por ronda, e passamos o \code{f} a vetor, com um tamanho por fila.
+  \item \textbf{Filas e variáveis do DRR (2, 3):} no \code{Sim2FlowsMP} todos os pacotes iam para a mesma fila. Como o DRR precisava de uma fila por fluxo, mudamos esta para um \textit{cell array} (\code{QUEUE\{1\}}, \code{QUEUE\{2\}} e \code{QUEUE\{3\}}) e acrescentámos a fila final (\code{FINALQUEUE}), onde ficam os pacotes escolhidos em cada ronda, e o crédito de cada fluxo (\code{CREDIT}), com os bytes que cada um ainda pode enviar.
+  \item \textbf{Chegada (4):} antes, o pacote entrava na fila única e perdia-se se essa fila estivesse cheia.
+  Neste caso alteramos isso para que o pacote só ocupe espaço na fila do seu fluxo; assim, em caso de congestionamento, quem envia demasiado enche apenas a sua própria fila sem tirar espaço aos outros.
+  \item \textbf{Ronda DRR (5):} Passámos a fazer uma ronda sempre que a fila final fica vazia: para cada fluxo com pacotes, somamos o quantum ao respetivo crédito e passamos para a fila final os primeiros pacotes que cabem nesse crédito. O crédito que sobrar ficaria então para a ronda seguinte, e uma fila vazia fica com crédito zero.
+  \item \textbf{Transmissão (6):} antes, no nosso simulador este saia sempre o primeiro pacote da fila única. Alterámos este e os pacotes passaram a ser transmitidos a partir da fila final, pela ordem da ronda.
 \end{itemize}
+
+\vspace{6em}
 
 \begin{lstlisting}[firstnumber=91]
             while isempty(FINALQUEUE) && any(queue_count > 0)
@@ -633,7 +679,10 @@ TT (Mbps) & 5,115 $\pm$ 0,008 & 0,800 $\pm$ 0,001 & 3,602 $\pm$ 0,006 \\
 \textbf{Justificação entre fluxos:}
 \begin{itemize}
   \item Sem perdas e com \textit{throughput} igual ao pedido ($\rho < 1$).
-  \item Com quanta iguais, cada fluxo tem direito a cerca de 3,33 Mbps. Quem envia menos espera menos: Fluxo 2 (0,8 Mbps) 2,0 ms, Fluxo 3 (3,6 Mbps) 4,3 ms, Fluxo 1 (5,12 Mbps) 10 ms.
+  \item Com quanta iguais, cada fluxo tem direito a cerca de 3,33 Mbps. 
+  
+  Quem envia menos acaba por esperar menos: 
+  Fluxo 2 (0,8 Mbps) 2,0 ms, Fluxo 3 (3,6 Mbps) 4,3 ms, Fluxo 1 (5,12 Mbps) 10 ms.
 \end{itemize}
 
 \textbf{Comparação com a 1.b (FIFO) e a 2.b (PQ):}
@@ -655,8 +704,8 @@ DRR (3.b)  & 10,05 & 2,02 & 4,32 & 73,8 & 5,26 & 25,4 \\
 \end{table}
 
 \begin{itemize}
-  \item FIFO trata todos por igual; PQ favorece o Fluxo 3; DRR protege quem envia pouco (Fluxo 2: 6,6 $\rightarrow$ 2,0 ms) e penaliza quem envia mais (Fluxo 1).
-  \item Perdas e \textit{throughput} iguais nos três: só muda quem espera.
+  \item FIFO trata todos os fluxos por igual; PQ favorece o Fluxo 3, que tem maior prioridade; e o DRR protege quem envia pouco (Fluxo 2) e penaliza quem envia mais (Fluxo 1).
+  \item As Perdas e o \textit{throughput} iguais nos três: só altera quem espera.
 \end{itemize}
 
 \subsection{3.c -- Caso D (congestionado) com Quantum = 1500 / 1500 / 1500}
@@ -684,11 +733,11 @@ TT (Mbps) & 4,500 $\pm$ 0,001 & 0,999 $\pm$ 0,001 & 4,500 $\pm$ 0,001 \\
 
 \textbf{Justificação entre fluxos:}
 \begin{itemize}
-  \item A ligação não chega para tudo (13,4 Mbps pedidos para 10 Mbps). O Fluxo 2 pede só 1 Mbps e recebe tudo; os outros dois dividem o resto, 4,5 Mbps cada.
+  \item A ligação não chega para tudo (13,4 Mbps pedidos para 10 Mbps). Neste caso o Fluxo 2 pede só 1 Mbps e recebe tudo; os outros dois dividem o resto, 4,5 Mbps cada.
   \item Os Fluxos 1 e 3 enchem as suas filas: perdem cerca de 21\% dos pacotes e esperam cerca de 1,6 s. O Fluxo 2 não perde nada (2,8 ms): o DRR isola os fluxos.
 \end{itemize}
 
-\textbf{Comparação com a 3.b:} no caso C o DRR só mudava os atrasos; no caso D passa a decidir quanto cada fluxo transmite.
+\textbf{Comparação com a 3.b:} no caso C o DRR só mudava os atrasos; no caso D este passa a decidir quanto cada fluxo transmite.
 
 \subsection{3.d -- Caso D com Quantum = 1500 / 1500 / 4500}
 
@@ -716,7 +765,8 @@ TT (Mbps) & 3,003 $\pm$ 0,006 & 1,000 $\pm$ 0,001 & 5,997 $\pm$ 0,006 \\
 \textbf{Justificação entre fluxos:}
 \begin{itemize}
   \item Com o triplo do peso, o Fluxo 3 tem direito a 6 Mbps, exatamente o que pede: sem perdas e com 7,7 ms de atraso.
-  \item O Fluxo 2 continua a receber tudo. O Fluxo 1 fica com o que sobra (3 Mbps), perde 42\% dos pacotes e espera cerca de 2,5 s.
+  \item O Fluxo 2 continua a receber tudo. 
+  \item Já Fluxo 1 fica com o que sobra (3 Mbps), perde 42\% dos pacotes e espera cerca de 2,5 s.
 \end{itemize}
 
 \textbf{Comparação com a 3.c:}
@@ -735,29 +785,26 @@ APD 3.c / 3.d (ms)   & 1649 / 2514 & 2,8 / 3,7 & 1621 / 7,7 \\
 \end{tabular}
 \end{table}
 
-\begin{itemize}
-  \item Triplicar o quantum do Fluxo 3 passa 1,5 Mbps do Fluxo 1 para o Fluxo 3. Com os quanta controla-se quanto cada fluxo recebe em congestionamento.
-\end{itemize}
 
 \subsection{3.e -- \textit{Throughput} ideal (\textit{max-min fairness} ponderado)}
 
-No DRR, os pesos do \textit{max-min fairness} são os quanta (Módulo 4). No caso D, os débitos pedidos são $x_i = \lambda_i \cdot 8 \cdot E[B_i]$: $x_1 = 6{,}4$, $x_2 = 1{,}0$ e $x_3 = 6{,}0$ Mbps, com $C = 10$ Mbps.
+No DRR, os pesos do \textit{max-min fairness} são os quanta.
+No caso D, os débitos pedidos são $x_i = \lambda_i \cdot 8 \cdot E[B_i]$: $x_1 = 6{,}4$, $x_2 = 1{,}0$ e $x_3 = 6{,}0$ Mbps, com $C = 10$ Mbps.
 
-\textbf{Caso da 3.c -- pesos 1 : 1 : 1.} Ordenando por débito pedido: Fluxo 2 (1,0) < Fluxo 3 (6,0) < Fluxo 1 (6,4).
+\textbf{Caso da 3.c -- com pesos 1 : 1 : 1.} Este é ordenando por débito pedido: Fluxo 2 (1,0) < Fluxo 3 (6,0) < Fluxo 1 (6,4).
 \begin{enumerate}
   \item Cada fluxo pode receber $d = 10/3 = 3{,}333$ Mbps.
   \item O Fluxo 2 pede $1{,}0 < 3{,}333$ e recebe 1,0 Mbps. Sobram $3{,}333 - 1{,}0 = 2{,}333$ Mbps.
   \item Os outros dois podem receber $d = 3{,}333 + 2{,}333/2 = 4{,}5$ Mbps. Os Fluxos 3 (6,0) e 1 (6,4) pedem mais, por isso recebem \textbf{4,5 Mbps cada}.
 \end{enumerate}
 
-\textbf{Caso da 3.d -- pesos 1 : 1 : 3.} Ordenando pelo débito pedido dividido pelo peso: Fluxo 2 (1,0) < Fluxo 3 (6,0/3 = 2,0) < Fluxo 1 (6,4).
+\textbf{Caso da 3.d -- com pesos 1 : 1 : 3.} Ordenando pelo débito pedido dividido pelo peso: Fluxo 2 (1,0) < Fluxo 3 (6,0/3 = 2,0) < Fluxo 1 (6,4).
 \begin{enumerate}
   \item Repartição inicial proporcional aos pesos: Fluxo 1 $= 10/5 = 2$, Fluxo 2 $= 2$, Fluxo 3 $= 3 \times 10/5 = 6$ Mbps.
   \item O Fluxo 2 pede $1{,}0 < 2$ e recebe 1,0. O Fluxo 3 pede $6{,}0 \le 6$ e recebe 6,0. Sobra $(2-1) + (6-6) = 1$ Mbps.
   \item O Fluxo 1 fica com $2 + 1 = $ \textbf{3,0 Mbps} ($< 6{,}4$).
 \end{enumerate}
 
-No script, este cálculo é feito por um ciclo genérico: divide a capacidade que resta pelos fluxos ainda ativos, proporcionalmente aos pesos; os fluxos cujo pedido cabe na sua parte recebem só o que pedem e saem; o que sobra volta a ser dividido.
 
 \begin{lstlisting}
 while any(active)
@@ -800,43 +847,34 @@ end
 % ============================================================
 % 5. CONCLUSÕES
 % ============================================================
-\newpage
-\section{Conclusões gerais}
+% \newpage
+% \section{Conclusões gerais}
 
-\begin{itemize}
-  \item \textbf{FIFO:} simples, mas o atraso de cada fluxo depende do tráfego dos outros.
-  \item \textbf{PQ:} protege o fluxo prioritário (cerca de 1 ms em todos os casos), à custa dos restantes.
-  \item \textbf{DRR:} reparte a ligação de forma justa e, em congestionamento, dá a cada fluxo a parte definida pelos quanta.
-  \item As simulações confirmam os modelos teóricos (M/G/1, M/G/1 com prioridades e \textit{max-min fairness}).
-\end{itemize}
+% \begin{itemize}
+%   \item \textbf{FIFO:} simples, mas o atraso de cada fluxo depende do tráfego dos outros.
+%   \item \textbf{PQ:} protege o fluxo prioritário (cerca de 1 ms em todos os casos), à custa dos restantes.
+%   \item \textbf{DRR:} reparte a ligação de forma justa e, em congestionamento, dá a cada fluxo a parte definida pelos quanta.
+%   \item As simulações confirmam os modelos teóricos (M/G/1, M/G/1 com prioridades e \textit{max-min fairness}).
+% \end{itemize}
 
 % ============================================================
 % ANEXOS
 % ============================================================
-\newpage
-\appendix
-\section{Código MATLAB}
-\label{sec:anexo}
+% \newpage
+% \appendix
+% \section{Código MATLAB}
+% \label{sec:anexo}
 
-\subsection{Simulador original -- \code{Sim2Flows}}
-\lstinputlisting{code/Sim2Flows_original.m}
+% \subsection{Task 2 -- \code{Sim2FlowsPrioMP.m}}
+% \lstinputlisting{code/Sim2FlowsPrioMP.m}
 
-\subsection{Task 1 -- \code{Sim2FlowsMP.m}}
-\lstinputlisting{code/Sim2FlowsMP.m}
+% \subsection{Task 2 -- script}
+% \lstinputlisting{code/MiniProject_Ex2_Jose_Fernandes_Pedro_Venda.m}
 
-\subsection{Task 1 -- script}
-\lstinputlisting{code/MiniProject_Ex1_Jose_Fernandes_Pedro_Venda.m}
+% \subsection{Task 3 -- \code{Sim2FlowsDRRMP.m}}
+% \lstinputlisting{code/Sim2FlowsDRRMP.m}
 
-\subsection{Task 2 -- \code{Sim2FlowsPrioMP.m}}
-\lstinputlisting{code/Sim2FlowsPrioMP.m}
-
-\subsection{Task 2 -- script}
-\lstinputlisting{code/MiniProject_Ex2_Jose_Fernandes_Pedro_Venda.m}
-
-\subsection{Task 3 -- \code{Sim2FlowsDRRMP.m}}
-\lstinputlisting{code/Sim2FlowsDRRMP.m}
-
-\subsection{Task 3 -- script}
-\lstinputlisting{code/MiniProject_Ex3_Jose_Fernandes_Pedro_Venda.m}
+% \subsection{Task 3 -- script}
+% \lstinputlisting{code/MiniProject_Ex3_Jose_Fernandes_Pedro_Venda.m}
 
 \end{document}
