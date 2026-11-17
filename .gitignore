@@ -5,3 +5,4 @@
 # Ficheiros temporarios do MATLAB
 *.asv
 *.m~
+!REPORT_LATEX/RELATORIO_MDRS.pdf
