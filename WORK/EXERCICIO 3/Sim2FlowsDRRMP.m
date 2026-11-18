@@ -20,12 +20,12 @@ DEPARTURE= 1;     % Departure of a packet
 
 %State variables:
 STATE = 0;                          % 0 - connection is free; 1 - connection is occupied
-% uma fila por fluxo (alterado em relacao ao Sim2FlowsMP)
+% one queue per flow
 QUEUEOCCUPATION= zeros(1,FLOW_NUM); % Occupation of each flow queue (in Bytes)
 QUEUE = cell(1,FLOW_NUM);           % Size, arriving time instant and flowID of each queued packet
 queue_count = zeros(1,FLOW_NUM);    % Tracks current number of packets in each queue
 for q = 1:FLOW_NUM
-    %for optimization purposes I will allocate a maximum of P spaces in each queue
+    %allocate a maximum of P spaces in each queue
     QUEUE{q} = zeros(P,3);
 end
 FINALQUEUE = [];                    % packets selected in the current DRR round
@@ -50,8 +50,7 @@ for k = 1:FLOW_NUM
 end
 
 % Simulation loop:
-while sum(TRANSPACKETS)<P       % Simulation stopping criterion
-    % proximo evento = o de menor instante (mais rapido que o sortrows)
+while sum(TRANSPACKETS)<P       
     [~, idx] = min(EventList(:,2));
     Event      = EventList(idx, 1);
     Clock      = EventList(idx, 2);
@@ -61,7 +60,7 @@ while sum(TRANSPACKETS)<P       % Simulation stopping criterion
     EventList(idx, :) = [];
 
     switch Event
-        case ARRIVAL         % If event is an ARRIVAL
+        case ARRIVAL
             TOTALPACKETS(Flow)= TOTALPACKETS(Flow)+1;
             tmp= Clock + exprnd(1/lambda(Flow));
             nextPacketSize= GenerateSize(flows{Flow});
@@ -70,7 +69,7 @@ while sum(TRANSPACKETS)<P       % Simulation stopping criterion
                 STATE= 1;
                 EventList = [EventList; DEPARTURE, Clock + 8*PacketSize/(C*1e6), PacketSize, Flow, Clock];
             else
-                % o pacote vai para a fila do seu fluxo
+                % the packet goes to its flow queue
                 if QUEUEOCCUPATION(Flow) + PacketSize <= f(Flow)
                     queue_count(Flow) = queue_count(Flow) + 1;
                     QUEUE{Flow}(queue_count(Flow), :) = [PacketSize , Clock, Flow];
@@ -79,20 +78,20 @@ while sum(TRANSPACKETS)<P       % Simulation stopping criterion
                     LOSTPACKETS(Flow)= LOSTPACKETS(Flow) + 1;
                 end
             end
-        case DEPARTURE          % If event is a DEPARTURE
+        case DEPARTURE
             TRANSBYTES(Flow)= TRANSBYTES(Flow) + PacketSize;
             TRANSPACKETS(Flow)= TRANSPACKETS(Flow) + 1;
             DELAYS(Flow)= DELAYS(Flow) + (Clock - ArrInstant);
             if Clock - ArrInstant > MAXDELAY(Flow)
                 MAXDELAY(Flow)= Clock - ArrInstant;
             end
-            % se a fila final esta vazia e ha pacotes em espera, comeca uma
-            % nova ronda DRR (fluxos pela ordem do ID: 1, 2, 3)
+            % if the final queue is empty and there are waiting packets, a
+            % new DRR round starts
             while isempty(FINALQUEUE) && any(queue_count > 0)
                 for q = 1:FLOW_NUM
                     if queue_count(q) > 0
                         CREDIT(q) = CREDIT(q) + Quantum(q);
-                        % move os primeiros pacotes cujo tamanho total nao excede o credito
+                        % moves packets which dont go over the credit
                         n = 0;
                         while n < queue_count(q) && QUEUE{q}(n+1,1) <= CREDIT(q)
                             n = n + 1;
@@ -104,16 +103,15 @@ while sum(TRANSPACKETS)<P       % Simulation stopping criterion
                             QUEUE{q}(1:queue_count(q)-n, :) = QUEUE{q}(n+1:queue_count(q), :);
                             queue_count(q) = queue_count(q) - n;
                         end
-                        % fila que fica vazia perde o credito
+                        % the empty queue loses the credit
                         if queue_count(q) == 0
                             CREDIT(q) = 0;
                         end
                     else
-                        CREDIT(q) = 0;   % fila vazia: credito a zero
+                        CREDIT(q) = 0;
                     end
                 end
             end
-            % o proximo pacote a transmitir e o primeiro da fila final
             if ~isempty(FINALQUEUE)
                 QSize= FINALQUEUE(1,1);
                 QInstant= FINALQUEUE(1,2);
