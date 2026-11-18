@@ -1,26 +1,25 @@
-flow1 = 100:1500;   % tamanhos fluxo 1 (Bytes)
-flow2 = 100:150;    % tamanhos fluxo 2 (Bytes)
-flow3 = 500:1000;   % tamanhos fluxo 3 (Bytes)
+flow1 = 100:1500;   % Bytes
+flow2 = 100:150;    % Bytes
+flow3 = 500:1000;   % Bytes
 flows = {flow1;flow2;flow3};
 
-% probabilidade de cada tamanho (uniforme)
 p_flow1 = zeros(1,numel(flow1)) + 1/numel(flow1);
 p_flow2 = zeros(1,numel(flow2)) + 1/numel(flow2);
 p_flow3 = zeros(1,numel(flow3)) + 1/numel(flow3);
 p_flows = {p_flow1;p_flow2;p_flow3};
 
-C = 10;           % capacidade (Mbps)
-f = [1e6 1e6];    % filas (Bytes): f1 prioridade alta, f2 prioridade baixa
-P = 100000;       % parar simulação: 100 000 pacotes transmitidos
-N = 50;           % nº de simulações
-alfa = 0.1;       % intervalo de confiança 90%
+C = 10;           % Mbps
+f = [1e6 1e6];    
+P = 100000;       
+N = 50;           % n de sim
+alfa = 0.1;       % confianca 
 
 % prioridades: fluxo 3 = 1 (alta), fluxos 1 e 2 = 2
 prio = [2 2 1];
 
-lambda1 = [400 600 800 1000];       % fluxo 1, casos A-D (pps)
-lambda2 = [400 600 800 1000];       % fluxo 2, casos A-D (pps)
-lambda3 = [600 600 600 1000];       % fluxo 3, casos A-D (pps)
+lambda1 = [400 600 800 1000];       % pps
+lambda2 = [400 600 800 1000];       % pps
+lambda3 = [600 600 600 1000];       % pps
 v_lambda_A = [lambda1(1), lambda2(1), lambda3(1)];
 v_lambda_B = [lambda1(2), lambda2(2), lambda3(2)];
 v_lambda_C = [lambda1(3), lambda2(3), lambda3(3)];
@@ -43,7 +42,6 @@ cases = ["A" "B" "C" "D"];
 
 
 %% 2.b
-% alocação de resultados
 packet_loss = zeros(N, 3);
 packet_delay = zeros(N, 3);
 max_packet_delay= zeros(N, 3);
@@ -58,7 +56,6 @@ for i = 1:N
     fprintf("%d\n", i);   % progresso
 end
 
-% média e intervalo de confiança 90%
 avg_packet_loss = mean(packet_loss);
 avg_packet_delay = mean(packet_delay);
 avg_max_packet_delay = mean(max_packet_delay);
@@ -90,7 +87,7 @@ for k = 1:4
     xticklabels(["Flow 1" "Flow 2" "Flow 3"])
     ylabel(names(k))
 end
-sgtitle('2.b - Priority Queuing, case C');
+sgtitle('2.b - Priority Queuing (case C)');
 
 % atraso da 2.b para a 2.c
 sim_packet_delay = avg_packet_delay;
@@ -103,24 +100,24 @@ sim_term_packet_delay = term_packet_delay;
 ES = zeros(1,3);
 ES2 = zeros(1,3);
 for k = 1:3
-    S = 8*flows{k}/(C*1e6);                  % tempo de transmissão (s)
-    ES(k) = sum(S.*p_flows{k});              % E[S]
-    ES2(k) = sum(S.^2.*p_flows{k});          % E[S^2]
+    S = 8*flows{k}/(C*1e6);                  %s
+    ES(k) = sum(S.*p_flows{k});
+    ES2(k) = sum(S.^2.*p_flows{k});
 end
 
-rho = v_lambda_C.*ES;                        % ocupação de cada fluxo
-num = sum(v_lambda_C.*ES2);                  % soma de todos os fluxos
+rho = v_lambda_C.*ES;
+num = sum(v_lambda_C.*ES2);
 
-rho_alta = sum(rho(prio==1));                % prioridade 1: fluxo 3
-rho_baixa = sum(rho(prio==2));               % prioridade 2: fluxos 1 e 2
+rho_alta = sum(rho(prio==1));
+rho_baixa = sum(rho(prio==2));
 
-WQ_alta = num/(2*(1-rho_alta));                          % fila prioridade alta
-WQ_baixa = num/(2*(1-rho_alta)*(1-rho_alta-rho_baixa));  % fila prioridade baixa
+WQ_alta = num/(2*(1-rho_alta));                          % fila alta
+WQ_baixa = num/(2*(1-rho_alta)*(1-rho_alta-rho_baixa));  % fila baixa
 
 WQ = zeros(1,3);
 WQ(prio==1) = WQ_alta;
 WQ(prio==2) = WQ_baixa;
-theory_packet_delay = (WQ + ES)*1000;        % fila + transmissão (ms)
+theory_packet_delay = (WQ + ES)*1000;        %ms
 
 for i = 1:3
     fprintf("Flow %d:\n Theoretical Avg. Packet Delay (ms) = %.3e\n", i, theory_packet_delay(i));
@@ -144,7 +141,6 @@ end
 
 
 %% 2.d
-% alocação dos resultados (N por caso)
 packet_loss = zeros(3*N, 3);
 packet_delay = zeros(3*N, 3);
 max_packet_delay= zeros(3*N, 3);
@@ -170,7 +166,7 @@ for i = 1:3*N
     fprintf("%d\n", i);
 end
 
-% fluxo 3 (coluna 3), um valor por caso
+
 for c = 1:3
     start = N*(c-1) + 1;
     avg_packet_delay(c) = mean(packet_delay(start:N*c,3));

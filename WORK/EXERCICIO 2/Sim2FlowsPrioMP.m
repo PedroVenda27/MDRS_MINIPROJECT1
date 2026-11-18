@@ -1,56 +1,51 @@
 function [PL , APD , MPD , TT] = Sim2FlowsPrioMP(lambda,C,f,P,flows,prio)
-% ENTRADAS:
-%  lambda - taxa de chegada de cada fluxo (pps)
-%  C      - capacidade da ligação (Mbps)
-%  f      - tamanho de cada fila de prioridade (Bytes)
-%  P      - nº de pacotes transmitidos (critério de paragem)
-%  flows  - tamanhos de cada fluxo (Bytes)
-%  prio   - prioridade de cada fluxo (1 = alta)
-% SAÍDAS:
-%  PL   - perda de pacotes (%)
-%  APD  - atraso médio (ms)
-%  MPD  - atraso máximo (ms)
-%  TT   - throughput (Mbps)
+% INPUT PARAMETERS:
+%  lambda - row vector with the packet rate of each flow (packets/sec)
+%  C      - link bandwidth (Mbps)
+%  f      - queue size (Bytes)
+%  P      - number of packets (stopping criterium)
+% OUTPUT PARAMETERS:
+%  PL   - row vector with the packet loss (%) of each flow
+%  APD  - row vector with the average packet delay (milliseconds) of each flow
+%  MPD  - maximum packet delay (milliseconds) of each flow
+%  TT   - transmitted throughput (Mbps) of each flow
 
 FLOW_NUM = length(flows);
 PRIO_NUM = max(prio);
 
-% Eventos:
-ARRIVAL= 0;   % chegada de um pacote
-DEPARTURE= 1;   % fim da transmissão de um pacote
+%Events:
+ARRIVAL= 0;       % Arrival of a packet            
+DEPARTURE= 1;     % Departure of a packet
 
-% Variáveis de estado:
-STATE = 0;   % 0 - ligação livre; 1 - ligação ocupada
-% uma fila por prioridade em vez de fila única
-QUEUEOCCUPATION= zeros(1,PRIO_NUM);   % ocupação de cada fila (Bytes)
-QUEUE = cell(1,PRIO_NUM);   % tamanho, instante de chegada e fluxo
-queue_count = zeros(1,PRIO_NUM);   % nº de pacotes em cada fila
+%State variables:
+STATE = 0;          % 0 - connection is free; 1 - connection is occupied
+% one queue per priority
+QUEUEOCCUPATION= zeros(1,PRIO_NUM);   % Occupation of the queue (in Bytes)
+QUEUE = cell(1,PRIO_NUM);   % Size, arriving time instant and flowID of each packet in the queue
+queue_count = zeros(1,PRIO_NUM);   % n of packets in each queue
 for q = 1:PRIO_NUM
-    % pré-alocação de P posições (mais rápido)
     QUEUE{q} = zeros(P,3);
 end
 
-% Contadores estatísticos:
-TOTALPACKETS= zeros(1,FLOW_NUM);   % pacotes que chegaram
-LOSTPACKETS= zeros(1,FLOW_NUM);   % pacotes perdidos (fila cheia)
-TRANSPACKETS= zeros(1,FLOW_NUM);   % pacotes transmitidos
-TRANSBYTES= zeros(1,FLOW_NUM);   % Bytes transmitidos
-DELAYS= zeros(1,FLOW_NUM);   % soma dos atrasos
-MAXDELAY= zeros(1,FLOW_NUM);   % atraso máximo
+% Initializing the required Statistical Counters:
+TOTALPACKETS= zeros(1,FLOW_NUM);    % No. of packets of each flow arrived to the system
+LOSTPACKETS= zeros(1,FLOW_NUM);     % No. of packets of each flow lost due to buffer fulness
+TRANSPACKETS= zeros(1,FLOW_NUM);    % No. of transmitted packets of each flow
+TRANSBYTES= zeros(1,FLOW_NUM);      % Sum of the Bytes of all transmitted packets of each flow
+DELAYS= zeros(1,FLOW_NUM);          % Sum of the delays of all transmitted packets of each flow
+MAXDELAY= zeros(1,FLOW_NUM);        % Maximum delay among all transmitted packets of each flow
 
-% Relógio da simulação:
+% Initializing the Simulation Clock:
 Clock= 0;
 
-% Primeira chegada de cada fluxo:
 EventList = zeros(FLOW_NUM, 5);
 for k = 1:FLOW_NUM
     tmp = Clock + exprnd(1/lambda(k));
     EventList(k,:) = [ARRIVAL, tmp, GenerateSize(flows{k}), k, tmp];
 end
 
-% Ciclo da simulação:
-while sum(TRANSPACKETS)<P       % critério de paragem
-    % próximo evento (min em vez de sortrows)
+% Simulation loop:
+while sum(TRANSPACKETS)<P       
     [~, idx] = min(EventList(:,2));
     Event      = EventList(idx, 1);
     Clock      = EventList(idx, 2);
@@ -60,7 +55,7 @@ while sum(TRANSPACKETS)<P       % critério de paragem
     EventList(idx, :) = [];
 
     switch Event
-        case ARRIVAL         % chegada
+        case ARRIVAL
             TOTALPACKETS(Flow)= TOTALPACKETS(Flow)+1;
             tmp= Clock + exprnd(1/lambda(Flow));
             nextPacketSize= GenerateSize(flows{Flow});
@@ -69,7 +64,7 @@ while sum(TRANSPACKETS)<P       % critério de paragem
                 STATE= 1;
                 EventList = [EventList; DEPARTURE, Clock + 8*PacketSize/(C*1e6), PacketSize, Flow, Clock];
             else
-                % fila da prioridade do pacote
+                % priority queue of the packet
                 q = prio(Flow);
                 if QUEUEOCCUPATION(q) + PacketSize <= f(q)
                     queue_count(q) = queue_count(q) + 1;
@@ -79,14 +74,14 @@ while sum(TRANSPACKETS)<P       % critério de paragem
                     LOSTPACKETS(Flow)= LOSTPACKETS(Flow) + 1;
                 end
             end
-        case DEPARTURE          % partida
+        case DEPARTURE
             TRANSBYTES(Flow)= TRANSBYTES(Flow) + PacketSize;
             TRANSPACKETS(Flow)= TRANSPACKETS(Flow) + 1;
             DELAYS(Flow)= DELAYS(Flow) + (Clock - ArrInstant);
             if Clock - ArrInstant > MAXDELAY(Flow)
                 MAXDELAY(Flow)= Clock - ArrInstant;
             end
-            % fila de prioridade mais alta não vazia
+            % highest non empty priority queue
             q = find(queue_count > 0, 1);
             if ~isempty(q)
                 QSize= QUEUE{q}(1,1);
@@ -104,11 +99,11 @@ while sum(TRANSPACKETS)<P       % critério de paragem
     end
 end
 
-% Cálculo dos parâmetros de desempenho:
-PL= 100*LOSTPACKETS./TOTALPACKETS;   % em percentagem
-APD= 1000*DELAYS./TRANSPACKETS;   % em milissegundos
-MPD= 1000*MAXDELAY;   % em milissegundos
-TT= 1e-6*TRANSBYTES*8/Clock;   % em Mbps
+% Performance parameters determination:
+PL= 100*LOSTPACKETS./TOTALPACKETS;  % in percentage
+APD= 1000*DELAYS./TRANSPACKETS;     % in milliseconds
+MPD= 1000*MAXDELAY;                % in milliseconds
+TT= 1e-6*TRANSBYTES*8/Clock;       % in Mbps
 
 end
 
