@@ -9,10 +9,10 @@ p_flow3 = zeros(1,numel(flow3)) + 1/numel(flow3);
 p_flows = {p_flow1;p_flow2;p_flow3};
 
 C = 10;               %Mbps
-f = [1e6 1e6 1e6];    %B  (f1 = f2 = f3, uma fila por fluxo)
+f = [1e6 1e6 1e6];    %B  (f1 = f2 = f3, one queue per flow)
 P = 100000;
-N = 50;               % numero de simulacoes
-alfa = 0.1;           % intervalo de confianca a 90%
+N = 50;               % number of simulations
+alfa = 0.1;           % confidence interval 90%
 
 lambda1 = [400 600 800 1000];       %pps
 lambda2 = [400 600 800 1000];       %pps
@@ -33,21 +33,21 @@ names = ["Packet loss (%)" "Avg. packet delay (ms)" "Max. packet delay (ms)" "Th
 
 
 %% 3.a
-% O simulador DRR esta no ficheiro Sim2FlowsDRRMP.m (na mesma pasta).
-% Foi feito a partir do Sim2FlowsMP do exercicio 1:
-%  - uma fila por fluxo, uma fila final e um credito (deficit) por fluxo
-%  - cada pacote vai para a fila do seu fluxo
-%  - quando a fila final fica vazia comeca uma nova ronda DRR: para cada
-%    fluxo (pela ordem do ID) soma-se o quantum ao credito e passam para a
-%    fila final os primeiros pacotes cujo tamanho total nao excede o credito
-%  - uma fila vazia fica com credito zero
+% The DRR simulator is in the file Sim2FlowsDRRMP.m .
+% It was built from Sim2FlowsMP from exercise 1:
+%  - one queue per flow, one final queue and one credit (deficit) per flow
+%  - each packet goes to the queue of its flow
+%  - when the final queue is empty, a new DRR round starts: for each flow
+%    (in ID order) the quantum is added to the credit, and the first packets
+%    whose total size does not exceed the credit are moved to the final queue
+%  - an empty queue has credit zero
 
 
 %% 3.b
-% caso C, Quantum = 1500 para cada fluxo
+% case C, Quantum = 1500 for each flow
 Quantum = [1500 1500 1500];
 
-% alocação de recursos
+% resource allocation
 packet_loss = zeros(N, 3);
 packet_delay = zeros(N, 3);
 max_packet_delay= zeros(N, 3);
@@ -62,7 +62,7 @@ for i = 1:N
     fprintf("%d\n", i);
 end
 
-% media e intervalo de confianca a 90% (Modulo 3, slide 21)
+% mean and 90% confidence interval 
 avgs = {mean(packet_loss), mean(packet_delay), mean(max_packet_delay), mean(throughput)};
 terms = {norminv(1-alfa/2)*sqrt(var(packet_loss)/N), norminv(1-alfa/2)*sqrt(var(packet_delay)/N), ...
          norminv(1-alfa/2)*sqrt(var(max_packet_delay)/N), norminv(1-alfa/2)*sqrt(var(throughput)/N)};
@@ -88,10 +88,10 @@ sgtitle('3.b - DRR (Q = 1500/1500/1500), case C');
 
 
 %% 3.c
-% caso D (congestionado), Quantum = 1500 para cada fluxo
+% case D (congested), Quantum = 1500 for each flow
 Quantum = [1500 1500 1500];
 
-% alocação de recursos
+% resource allocation
 packet_loss = zeros(N, 3);
 packet_delay = zeros(N, 3);
 max_packet_delay= zeros(N, 3);
@@ -129,16 +129,17 @@ for k = 1:4
 end
 sgtitle('3.c - DRR (Q = 1500/1500/1500), case D');
 
-% guardar o throughput para comparar com o ideal na 3.e
+% throughput to compare with the ideal in 3.e
 sim_throughput_c = avgs{4};
 sim_term_throughput_c = terms{4};
 
 
 %% 3.d
-% caso D (congestionado), Quantum = 1500 / 1500 / 4500
+% case D (congested), 
+% Quantum = 1500 / 1500 / 4500
 Quantum = [1500 1500 4500];
 
-% alocação de recursos
+% resource allocation
 packet_loss = zeros(N, 3);
 packet_delay = zeros(N, 3);
 max_packet_delay= zeros(N, 3);
@@ -176,38 +177,38 @@ for k = 1:4
 end
 sgtitle('3.d - DRR (Q = 1500/1500/4500), case D');
 
-% guardar o throughput para comparar com o ideal na 3.e
+% save the throughput to compare with the ideal in 3.e
 sim_throughput_d = avgs{4};
 sim_term_throughput_d = terms{4};
 
 
 %% 3.e
-% throughput ideal pelo max-min fairness ponderado (Modulo 4, slides 12-15)
-% debito pedido por cada fluxo no caso D: lambda * 8 * tamanho medio
+% ideal throughput via weighted max-min fairness 
+% requested rate per flow 
 avg_size = zeros(1,3);
 for k = 1:3
-    avg_size(k) = sum(flows{k}.*p_flows{k});      % tamanho medio (Bytes)
+    avg_size(k) = sum(flows{k}.*p_flows{k});      % average size (Bytes)
 end
 x = v_lambda_D*8.*avg_size/1e6;                   % Mbps -> [6.4 1.0 6.0]
 
-% no DRR os pesos sao os valores de quantum
+% DRR weights 
 weights = [1500 1500 1500; 1500 1500 4500];
 
 for w = 1:2
-    % algoritmo do max-min fairness ponderado
+    % weighted max-min fairness algorithm
     ideal = zeros(1,3);
-    active = true(1,3);       % fluxos ainda nao satisfeitos
-    left = C;                 % capacidade ainda por atribuir
+    active = true(1,3);       
+    left = C;                
     while any(active)
         share = left*weights(w,active)/sum(weights(w,active));
         idx = find(active);
         satisfied = x(idx) <= ideal(idx) + share;
         if ~any(satisfied)
-            % nenhum fluxo fica satisfeito: todos recebem a sua parte
+            % no flow is satisfied
             ideal(idx) = ideal(idx) + share;
             break;
         end
-        % os satisfeitos recebem so o que pedem; o que sobra e dividido de novo
+        % satisfied flows only get what they request
         for j = idx(satisfied)
             left = left - (x(j) - ideal(j));
             ideal(j) = x(j);
